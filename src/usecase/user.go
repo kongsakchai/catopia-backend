@@ -1,70 +1,39 @@
 package usecase
 
 import (
-	"database/sql"
-
 	"github.com/gin-gonic/gin"
-	"github.com/kongsakchai/catopia-backend/src/dto"
-	"github.com/kongsakchai/catopia-backend/src/helper"
 	"github.com/kongsakchai/catopia-backend/src/model"
 	"github.com/kongsakchai/catopia-backend/src/repository"
 )
 
 type UserUsecase struct {
-	repo *repository.UserRepository
+	userRepo *repository.UserRepository
 }
 
-func NewUserUsecase(repo *repository.UserRepository) *UserUsecase {
-	return &UserUsecase{repo}
+func NewUserUsecase(c *gin.Context, userRepo *repository.UserRepository) *UserUsecase {
+	return &UserUsecase{userRepo}
 }
 
-func (u *UserUsecase) SignUp(c *gin.Context, req *dto.SignUpDTO) error {
-	findUser, err := u.repo.GetByUsername(req.Username)
-	if err != nil && err != sql.ErrNoRows {
-		return err
-	}
-
-	if findUser.Username != "" {
-		return nil
-	}
-
-	findUser, err = u.repo.GetByEmail(req.Email)
-	if err != nil && err != sql.ErrNoRows {
-		return err
-	}
-
-	if findUser.Username != "" {
-		return nil
-	}
-
-	println(findUser)
-
-	user, err := helper.Mapping[model.UserModel](req)
-	if err != nil {
-		return err
-	}
-
-	user.Salt = helper.RandSalt(9)
-	user.Password, err = helper.PasswordHash(user.Password, user.Salt)
-	if err != nil {
-		return err
-	}
-	return u.repo.Create(user)
-
+func (u *UserUsecase) Create(user *model.UserModel) error {
+	return u.userRepo.Create(user)
 }
 
-func (u *UserUsecase) SignIn(c *gin.Context, req *dto.SignInDTO) (*dto.UserDTO, error) {
-	user, err := u.repo.GetByUsername(req.Email)
-	if err != nil {
-		return nil, err
-	}
-	if user == nil {
-		return nil, nil
-	}
+func (u *UserUsecase) GetByUsername(username string) (*model.UserModel, error) {
+	return u.userRepo.GetByUsername(username)
+}
 
-	if helper.CheckPasswordHash(req.Password+user.Salt, user.Password) {
-		return helper.Mapping[dto.UserDTO](user)
-	}
+func (u *UserUsecase) GetByEmail(email string) (*model.UserModel, error) {
+	return u.userRepo.GetByEmail(email)
+}
 
-	return nil, nil
+func (u *UserUsecase) GetByID(id int) (*model.UserModel, error) {
+	return u.userRepo.GetByID(id)
+}
+
+func (u *UserUsecase) Update(user *model.UserModel) error {
+	return u.userRepo.Update(user)
+}
+
+func (u *UserUsecase) Delete(id int) error {
+	return u.userRepo.Delete(id)
 }

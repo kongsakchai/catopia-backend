@@ -2,26 +2,33 @@ package main
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
-	"github.com/kongsakchai/catopia-backend/src/controller"
-	"github.com/kongsakchai/catopia-backend/src/repository"
-	"github.com/kongsakchai/catopia-backend/src/usecase"
+	"github.com/joho/godotenv"
+	"github.com/kongsakchai/catopia-backend/src/route"
 )
 
 var db *sqlx.DB
 
 func main() {
-	cfg := mysql.Config{
-		User:   "root",     // os
-		Passwd: "12345678", // os
-		Net:    "tcp",
-		Addr:   "127.0.0.1:3306",
-		DBName: "catopia",
+	if err := godotenv.Load(); err != nil {
+		panic(err)
 	}
+
+	cfg := mysql.Config{
+		User:                 os.Getenv("DB_USER"),
+		Passwd:               os.Getenv("DB_PASSWORD"),
+		Net:                  "tcp",
+		Addr:                 os.Getenv("DB_HOST"),
+		DBName:               "catopia",
+		AllowNativePasswords: true,
+	}
+
+	print(cfg.FormatDSN())
 
 	var err error
 	db, err = sqlx.Open("mysql", cfg.FormatDSN())
@@ -32,23 +39,8 @@ func main() {
 
 	r := gin.Default()
 	r.Use(cors.Default())
-	routeRigister(r)
+
+	route.RigisterRoute(r, db)
 
 	r.Run()
-}
-
-func routeRigister(r *gin.Engine) {
-	api := r.Group("/api")
-
-	user(api)
-
-}
-
-func user(r *gin.RouterGroup) {
-	repo := repository.NewUserRepository(db)
-	usecase := usecase.NewUserUsecase(repo)
-	controller := controller.NewUserController(usecase)
-
-	r.POST("/sign-up", controller.SignUp)
-	r.POST("/sign-in", controller.SignIn)
 }
