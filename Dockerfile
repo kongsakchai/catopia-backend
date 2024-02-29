@@ -3,10 +3,12 @@ WORKDIR /app
 COPY go.mod go.sum ./
 RUN go mod download && go mod verify
 COPY . .
-RUN go build -a -o catopia
+RUN go build -o catopia ./src/main.go
 
-FROM alpine:latest  
-RUN apk --no-cache add ca-certificates
+FROM alpine:latest
+ARG PORT=8080
+RUN apk --no-cache add ca-certificates libc6-compat
 WORKDIR /root/
 COPY --from=0 /app/catopia .
-CMD ["./catopia"]  
+EXPOSE $PORT
+CMD ["./catopia"]
