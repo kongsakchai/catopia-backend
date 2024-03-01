@@ -8,17 +8,13 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
-	"github.com/joho/godotenv"
+	_ "github.com/joho/godotenv/autoload"
 	"github.com/kongsakchai/catopia-backend/src/route"
 )
 
 var db *sqlx.DB
 
 func main() {
-	if err := godotenv.Load(); err != nil {
-		panic(err)
-	}
-
 	cfg := mysql.Config{
 		User:                 os.Getenv("DB_USER"),
 		Passwd:               os.Getenv("DB_PASSWORD"),
@@ -42,5 +38,10 @@ func main() {
 
 	route.RigisterRoute(r, db)
 
-	r.Run()
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+
+	r.Run(fmt.Sprintf(":%s", port))
 }

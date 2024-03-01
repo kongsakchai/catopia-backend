@@ -6,9 +6,8 @@ COPY . .
 RUN go build -o catopia ./src/main.go
 
 FROM alpine:latest
-ARG PORT=8080
 RUN apk --no-cache add ca-certificates libc6-compat
 WORKDIR /root/
 COPY --from=0 /app/catopia .
-EXPOSE $PORT
+EXPOSE 8080
 CMD ["./catopia"]
