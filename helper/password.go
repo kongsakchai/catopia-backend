@@ -1,13 +1,14 @@
 package helper
 
 import (
+	"fmt"
 	"math/rand"
 
 	"golang.org/x/crypto/bcrypt"
 )
 
-func PasswordHash(password string, salt string) (string, error) {
-	str := password + salt
+func PasswordHash(password, salt string) (string, error) {
+	str := fmt.Sprintf("%s%s", password, salt)
 
 	bytes, err := bcrypt.GenerateFromPassword([]byte(str), 14)
 	return string(bytes), err
@@ -23,7 +24,9 @@ func RandSalt(n int) string {
 	return string(b)
 }
 
-func CheckPasswordHash(password, hash string) bool {
-	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+func CheckPasswordHash(password, salt, hash string) bool {
+	str := fmt.Sprintf("%s%s", password, salt)
+
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(str))
 	return err == nil
 }
