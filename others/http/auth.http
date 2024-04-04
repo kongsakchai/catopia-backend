@@ -1,0 +1,25 @@
+@url = http://localhost:8080/api
+
+POST {{url}}/auth/login
+
+{
+    "username": "admin2",
+    "password": "admin2"
+}
+
+###
+
+POST {{url}}/auth/register
+
+{
+    "username": "admin1",
+    "password": "admin",
+    "email": "test1@gmail.com",
+    "gender": "male",
+    "date":"21/10/2000"
+}
+
+###
+
+DELETE  {{url}}/auth/logout
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjMzYmRmMDFjLTJhMDUtNGFjMy04YTVlLTEwNDc3MjIyOWUxOCJ9.qqwid9LVrgGVKxj2zI11Ou1KnDttDEFOfPEBnKCtWwo

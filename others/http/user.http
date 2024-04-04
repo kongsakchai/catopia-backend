@@ -1,0 +1,26 @@
+@url = http://localhost:8080/api
+
+
+GET {{url}}/user
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjMzYmRmMDFjLTJhMDUtNGFjMy04YTVlLTEwNDc3MjIyOWUxOCJ9.qqwid9LVrgGVKxj2zI11Ou1KnDttDEFOfPEBnKCtWwo
+
+###
+
+put {{url}}/user
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjMzYmRmMDFjLTJhMDUtNGFjMy04YTVlLTEwNDc3MjIyOWUxOCJ9.qqwid9LVrgGVKxj2zI11Ou1KnDttDEFOfPEBnKCtWwo
+
+{
+    "username": "admin2",
+    "email": "test@gmail2.com",
+    "gender": "male",
+    "date":"21/10/2000"
+}
+
+###
+
+PUT {{url}}/user/password
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjMzYmRmMDFjLTJhMDUtNGFjMy04YTVlLTEwNDc3MjIyOWUxOCJ9.qqwid9LVrgGVKxj2zI11Ou1KnDttDEFOfPEBnKCtWwo
+
+{
+    "password": "admin2"
+}
