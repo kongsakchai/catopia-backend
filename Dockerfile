@@ -6,7 +6,8 @@ COPY . .
 RUN go build -o catopia main.go
 
 FROM alpine:latest
-RUN apk --no-cache add ca-certificates libc6-compat
+RUN apk --no-cache add ca-certificates libc6-compat tzdata
+ENV TZ="Asia/Bangkok"
 WORKDIR /root/
 COPY --from=0 /app/catopia .
 EXPOSE 8080

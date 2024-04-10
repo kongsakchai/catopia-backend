@@ -10,11 +10,12 @@ POST {{url}}/auth/login
 ###
 
 POST {{url}}/auth/register
+Content-Type: application/json
 
 {
-    "username": "admin1",
-    "password": "admin",
-    "email": "test1@gmail.com",
+    "username": "test",
+    "password": "test",
+    "email": "test@gmail.com",
     "gender": "male",
     "date":"21/10/2000"
 }
