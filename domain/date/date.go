@@ -10,8 +10,7 @@ type JSONDate time.Time
 // Marshal returns the JSON encoding of t.
 func (t JSONDate) MarshalJSON() ([]byte, error) {
 	thaiLocation, _ := time.LoadLocation("Asia/Bangkok")
-	formatted := time.Time(t).In(thaiLocation).Format("02/01/2006")
-
+	formatted := time.Time(t).In(thaiLocation).Format("2006-01-02")
 	return []byte(`"` + formatted + `"`), nil
 }
 
@@ -20,7 +19,7 @@ func (t *JSONDate) UnmarshalJSON(b []byte) error {
 	thaiLocation, _ := time.LoadLocation("Asia/Bangkok")
 	s := string(b)
 	s = s[1 : len(s)-1]
-	tt, err := time.ParseInLocation("02/01/2006", s, thaiLocation)
+	tt, err := time.ParseInLocation("2006-01-02", s, thaiLocation)
 	if err != nil {
 		return err
 	}
