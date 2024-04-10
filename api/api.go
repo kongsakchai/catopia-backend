@@ -34,7 +34,7 @@ func (api *API) Start() {
 
 	api.initRoute()
 
-	app.Run(fmt.Sprintf("127.0.0.1:%s", port))
+	app.Run(fmt.Sprintf(":%s", port))
 }
 
 func (a *API) initRoute() {
