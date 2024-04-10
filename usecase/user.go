@@ -59,15 +59,39 @@ func (u *userUsecase) Create(ctx context.Context, user *domain.UserModel) error 
 	return nil
 }
 
-func (u *userUsecase) Update(ctx context.Context, id int, user *domain.UserModel) error {
-	data, err := u.GetByID(ctx, id)
+func (u *userUsecase) Update(ctx context.Context, id int, data *domain.UserModel) error {
+	user, err := u.GetByID(ctx, id)
 	if err != nil {
 		return err
 	}
 
-	user.ID = data.ID
-	user.Salt = data.Salt
-	user.Password = data.Password
+	if data.Password != "" {
+		salt := pwd.Salt(9)
+		hashPassword, err := pwd.PasswordHash(user.Password, salt)
+		if err != nil {
+			return errs.New(errs.ErrInternal, "Internal server error", err)
+		}
+
+		user.Password = hashPassword
+		user.Salt = salt
+	}
+
+	if data.Username != "" && data.Username != user.Username {
+		user.Username = data.Username
+	}
+
+	if data.Email != "" && data.Email != user.Email {
+		user.Email = data.Email
+	}
+
+	if data.Gender != "" && data.Gender != user.Gender {
+		user.Gender = data.Gender
+	}
+
+	if !data.Date.Time().Equal(user.Date.Time()) {
+		user.Date = data.Date
+	}
+
 	err = u.userRepo.Update(ctx, user)
 	if err != nil {
 		return errs.New(errs.ErrInternal, "Internal server error", err)

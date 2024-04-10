@@ -1,13 +1,14 @@
 @url = http://localhost:8080/api
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImU5YjMxYjk2LTMxNTgtNDA0Yi04ZTcxLTk2MDViYjdjMGI2MCJ9.xafbfwB14QE_ha5O2cmQGGJNCKof1hS3oL_x2ZtLVe4
 
 
 GET {{url}}/user
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjMzYmRmMDFjLTJhMDUtNGFjMy04YTVlLTEwNDc3MjIyOWUxOCJ9.qqwid9LVrgGVKxj2zI11Ou1KnDttDEFOfPEBnKCtWwo
+Authorization: Bearer {{token}}
 
 ###
 
 put {{url}}/user
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjMzYmRmMDFjLTJhMDUtNGFjMy04YTVlLTEwNDc3MjIyOWUxOCJ9.qqwid9LVrgGVKxj2zI11Ou1KnDttDEFOfPEBnKCtWwo
+Authorization: Bearer {{token}}
 
 {
     "username": "admin2",
@@ -19,7 +20,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjMzYmRmMDFjL
 ###
 
 PUT {{url}}/user/password
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjMzYmRmMDFjLTJhMDUtNGFjMy04YTVlLTEwNDc3MjIyOWUxOCJ9.qqwid9LVrgGVKxj2zI11Ou1KnDttDEFOfPEBnKCtWwo
+Authorization: Bearer {{token}}
 
 {
     "password": "admin2"

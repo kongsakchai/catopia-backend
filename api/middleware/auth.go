@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -11,6 +12,8 @@ import (
 
 func AuthorizationMiddleware(sessionUsecase domain.SessionUsecase) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		fmt.Println("AuthorizationMiddleware")
+
 		s := c.Request.Header.Get("Authorization")
 		token := strings.TrimPrefix(s, "Bearer ")
 

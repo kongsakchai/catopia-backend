@@ -3,7 +3,6 @@ package api
 import (
 	"fmt"
 
-	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/kongsakchai/catopia-backend/api/handler"
 	"github.com/kongsakchai/catopia-backend/api/middleware"
@@ -29,8 +28,18 @@ func (api *API) Start() {
 	app := gin.Default()
 	api.app = app
 
-	app.Use(cors.Default())
-	app.Static("/images", "./upload/images")
+	// cors := cors.New(cors.Config{
+	// 	AllowMethods:     []string{"GET", "POST", "PUT", "DELETE"},
+	// 	AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
+	// 	ExposeHeaders:    []string{"Content-Length"},
+	// 	AllowAllOrigins:  true,
+	// 	AllowCredentials: true,
+	// })
+	// app.Use(cors)
+
+	app.Use(middleware.CORSMiddleware())
+
+	// app.Static("/images", "./upload/images")
 
 	api.initRoute()
 
@@ -57,7 +66,7 @@ func (a *API) initRoute() {
 	auth.DELETE("/logout", middleware.AuthorizationMiddleware(sessionUsecase), authHandler.Logout)
 
 	user := api.Group("/user", middleware.AuthorizationMiddleware(sessionUsecase))
-	user.GET("/", userHandler.Get)
-	user.PUT("/", userHandler.Update)
+	user.GET("", userHandler.Get)
+	user.PUT("", userHandler.Update)
 	user.PUT("/password", userHandler.UpdatePassword)
 }

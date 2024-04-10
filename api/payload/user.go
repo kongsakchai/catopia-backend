@@ -3,10 +3,11 @@ package payload
 import "github.com/kongsakchai/catopia-backend/domain/date"
 
 type UpdateUser struct {
-	Username string         `json:"username" binding:"required"`
-	Email    string         `json:"email" binding:"required"`
-	Gender   string         `json:"gender" binding:"required"`
-	Date     *date.JSONDate `json:"date" binding:"required"`
+	Username string         `json:"username"`
+	Email    string         `json:"email"`
+	Gender   string         `json:"gender"`
+	Date     *date.JSONDate `json:"date"`
+	Password string         `json:"password"`
 }
 
 type UpdatePassword struct {

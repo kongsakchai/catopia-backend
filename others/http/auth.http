@@ -3,8 +3,8 @@
 POST {{url}}/auth/login
 
 {
-    "username": "admin2",
-    "password": "admin2"
+    "username": "admin",
+    "password": "admin"
 }
 
 ###
