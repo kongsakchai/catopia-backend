@@ -3,6 +3,7 @@ package api
 import (
 	"fmt"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/kongsakchai/catopia-backend/api/handler"
 	"github.com/kongsakchai/catopia-backend/api/middleware"
@@ -28,16 +29,16 @@ func (api *API) Start() {
 	app := gin.Default()
 	api.app = app
 
-	// cors := cors.New(cors.Config{
-	// 	AllowMethods:     []string{"GET", "POST", "PUT", "DELETE"},
-	// 	AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
-	// 	ExposeHeaders:    []string{"Content-Length"},
-	// 	AllowAllOrigins:  true,
-	// 	AllowCredentials: true,
-	// })
-	// app.Use(cors)
+	cors := cors.New(cors.Config{
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowAllOrigins:  true,
+		AllowCredentials: true,
+	})
+	app.Use(cors)
 
-	app.Use(middleware.CORSMiddleware())
+	// app.Use(middleware.CORSMiddleware())
 
 	// app.Static("/images", "./upload/images")
 

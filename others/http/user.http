@@ -1,5 +1,5 @@
-@url = http://localhost:8080/api
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImU5YjMxYjk2LTMxNTgtNDA0Yi04ZTcxLTk2MDViYjdjMGI2MCJ9.xafbfwB14QE_ha5O2cmQGGJNCKof1hS3oL_x2ZtLVe4
+@url = 
+@token = 
 
 
 GET {{url}}/user
