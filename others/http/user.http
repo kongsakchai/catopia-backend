@@ -11,10 +11,10 @@ put {{url}}/user
 Authorization: Bearer {{token}}
 
 {
-    "username": "admin2",
-    "email": "test@gmail2.com",
-    "gender": "male",
-    "date":"21/10/2000"
+    "username": "",
+    "email": "",
+    "gender": "",
+    "date":""
 }
 
 ###
@@ -23,5 +23,5 @@ PUT {{url}}/user/password
 Authorization: Bearer {{token}}
 
 {
-    "password": "admin2"
+    "password": ""
 }

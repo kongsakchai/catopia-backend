@@ -4,8 +4,8 @@
 POST {{url}}/auth/login
 
 {
-    "username": "admin",
-    "password": "admin"
+    "username": "",
+    "password": ""
 }
 
 ###
@@ -14,11 +14,11 @@ POST {{url}}/auth/register
 Content-Type: application/json
 
 {
-    "username": "test",
-    "password": "test",
-    "email": "test@gmail.com",
-    "gender": "male",
-    "date":"21/10/2000"
+    "username": "",
+    "password": "",
+    "email": "",
+    "gender": "",
+    "date":""
 }
 
 ###
