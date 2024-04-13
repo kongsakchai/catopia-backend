@@ -1,10 +1,9 @@
 version: "3.1"
 
 services:
-  database:
+  db:
     container_name: db
     image: mysql
-    restart: always
     command: --default-authentication-plugin=caching_sha2_password
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
@@ -13,12 +12,13 @@ services:
       - 3306:3306
     volumes:
       - "database:/var/lib/mysql"
-    secrets:
-      - db_root_password
     networks:
       - app
+    env_file:
+      - .env
 
   adminer:
+    container_name: adminer
     image: adminer
     restart: always
     ports:
@@ -29,6 +29,7 @@ services:
       - app
   
   backend:
+    container_name: backend
     image: backend
     build: .
     ports:
@@ -48,8 +49,4 @@ volumes:
   database:
     name: database
     driver: local
-
-env_file:
-  - path: ./.env
-    required: true 
 
