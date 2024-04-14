@@ -9,6 +9,7 @@ import (
 	"github.com/kongsakchai/catopia-backend/api/response"
 	"github.com/kongsakchai/catopia-backend/domain"
 	errs "github.com/kongsakchai/catopia-backend/domain/error"
+	"github.com/kongsakchai/catopia-backend/utils/data"
 )
 
 type UserHandler struct {
@@ -20,11 +21,47 @@ func NewUserHandler(userUsecase domain.UserUsecase) *UserHandler {
 }
 
 func (h *UserHandler) Get(c *gin.Context) {
-	GetByID(c, h.userUsecase.GetByID)
+	id, err := strconv.Atoi(c.Param("user_id"))
+	if err != nil {
+		response.NewErrorResponse(c, errs.New(errs.ErrBadRequest, "Bad Request", err))
+		return
+	}
+
+	data, err := h.userUsecase.GetByID(c, id)
+	if err != nil {
+		response.NewErrorResponse(c, err)
+		return
+	}
+
+	response.NewResponse(c, http.StatusOK, "success", data)
 }
 
 func (h *UserHandler) Update(c *gin.Context) {
-	Update[payload.UpdateUser](c, h.userUsecase.Update)
+	var req payload.UpdateUser
+	if err := c.ShouldBindJSON(&req); err != nil {
+		response.NewErrorResponse(c, errs.New(errs.ErrBadRequest, "Bad Request", err))
+		return
+	}
+
+	id, err := strconv.Atoi(c.Param("user_id"))
+	if err != nil {
+		response.NewErrorResponse(c, errs.New(errs.ErrBadRequest, "Bad Request", err))
+		return
+	}
+
+	data, err := data.Mapping[domain.UserModel](&req)
+	if err != nil {
+		response.NewErrorResponse(c, err)
+		return
+	}
+
+	err = h.userUsecase.Update(c, id, data)
+	if err != nil {
+		response.NewErrorResponse(c, err)
+		return
+	}
+
+	response.NewResponse(c, http.StatusOK, "success", nil)
 }
 
 func (h *UserHandler) UpdatePassword(c *gin.Context) {
@@ -34,7 +71,7 @@ func (h *UserHandler) UpdatePassword(c *gin.Context) {
 		return
 	}
 
-	id, err := strconv.Atoi(c.Param("id"))
+	id, err := strconv.Atoi(c.Param("user_id"))
 	if err != nil {
 		response.NewErrorResponse(c, errs.New(errs.ErrBadRequest, "Bad Request", err))
 		return

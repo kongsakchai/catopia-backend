@@ -92,6 +92,10 @@ func (u *userUsecase) Update(ctx context.Context, id int, data *domain.UserModel
 		user.Date = data.Date
 	}
 
+	if data.Profile != nil && data.Profile != user.Profile {
+		user.Profile = data.Profile
+	}
+
 	err = u.userRepo.Update(ctx, user)
 	if err != nil {
 		return errs.New(errs.ErrInternal, "Internal server error", err)

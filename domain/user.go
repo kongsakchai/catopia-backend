@@ -15,6 +15,7 @@ type UserModel struct {
 	Gender    string         `json:"gender" db:"gender"`
 	Date      *date.JSONDate `json:"date" db:"date"`
 	CreatedAt *date.JSONDate `json:"createdAt" db:"created_at"`
+	Profile   *string        `json:"profile" db:"profile"`
 }
 
 type UserRepository interface {

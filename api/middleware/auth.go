@@ -24,7 +24,7 @@ func AuthorizationMiddleware(sessionUsecase domain.SessionUsecase) gin.HandlerFu
 			return
 		}
 
-		c.Params = append(c.Params, gin.Param{Key: "id", Value: strconv.FormatInt(session.UserID, 10)})
+		c.Params = append(c.Params, gin.Param{Key: "user_id", Value: strconv.FormatInt(session.UserID, 10)})
 		c.Params = append(c.Params, gin.Param{Key: "session_id", Value: session.ID})
 		c.Next()
 	}

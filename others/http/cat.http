@@ -1,0 +1,42 @@
+@url = http://localhost:8080/api
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTMxMzI5MDQsInN1YiI6ImI2YjQxYzFjLWNlMjktNGVmZS04N2NiLWI1MmJhZmY2NTM2ZiJ9.BJ1gVGg2CFVnMrSk9Y7cm9E_1_0gsMm23eyC5u3BG44
+
+
+GET {{url}}/cat
+Authorization: Bearer {{token}}
+
+###
+
+GET  {{url}}/cat/1
+Authorization: Bearer {{token}}
+
+###
+
+post {{url}}/cat
+Authorization: Bearer {{token}}
+
+{
+    "name": "Nana",
+    "gender":"Female",
+    "profile":"",
+    "weight":10,
+    "date":"2000-10-21"
+}
+
+###
+
+put {{url}}/cat/1
+Authorization: Bearer {{token}}
+
+{
+    "name": "Mori",
+    "gender":"Male",
+    "profile":"",
+    "weight":12,
+    "date":"2000-10-21"
+}
+
+###
+
+delete {{url}}/cat/1
+Authorization: Bearer {{token}}

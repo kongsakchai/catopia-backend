@@ -44,20 +44,23 @@ func (api *API) Start() {
 
 	api.initRoute()
 
-	app.Run(fmt.Sprintf(":%s", port))
+	app.Run(fmt.Sprintf("127.0.0.1:%s", port))
 }
 
 func (a *API) initRoute() {
 
 	sessionRepo := repository.NewSessionRepository()
 	userRepo := repository.NewUserRepository()
+	catRepo := repository.NewCatRepository()
 
 	sessionUsecase := usecase.NewSessionUsecase(sessionRepo)
 	userUsecase := usecase.NewUserUsecase(userRepo)
 	authUsecase := usecase.NewAuthUsecase(userUsecase, sessionUsecase)
+	catUsecase := usecase.NewCatUsecase(catRepo)
 
 	authHandler := handler.NewAuthHandler(authUsecase)
 	userHandler := handler.NewUserHandler(userUsecase)
+	catHandler := handler.NewCatHandler(catUsecase)
 
 	api := a.app.Group("/api")
 
@@ -70,4 +73,11 @@ func (a *API) initRoute() {
 	user.GET("", userHandler.Get)
 	user.PUT("", userHandler.Update)
 	user.PUT("/password", userHandler.UpdatePassword)
+
+	cat := api.Group("/cat", middleware.AuthorizationMiddleware(sessionUsecase))
+	cat.GET("/:id", catHandler.GetByID)
+	cat.GET("", catHandler.GetAll)
+	cat.POST("", catHandler.Create)
+	cat.PUT("/:id", catHandler.Update)
+	cat.DELETE("/:id", catHandler.Delete)
 }
