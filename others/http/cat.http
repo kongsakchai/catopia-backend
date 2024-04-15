@@ -1,5 +1,5 @@
 @url = http://localhost:8080/api
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTMxMzI5MDQsInN1YiI6ImI2YjQxYzFjLWNlMjktNGVmZS04N2NiLWI1MmJhZmY2NTM2ZiJ9.BJ1gVGg2CFVnMrSk9Y7cm9E_1_0gsMm23eyC5u3BG44
+@token = 
 
 
 GET {{url}}/cat
@@ -7,7 +7,7 @@ Authorization: Bearer {{token}}
 
 ###
 
-GET  {{url}}/cat/1
+GET  {{url}}/cat/2
 Authorization: Bearer {{token}}
 
 ###

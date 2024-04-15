@@ -16,6 +16,7 @@ type Config struct {
 	DBname     string
 	Port       string
 	Secret     string
+	TokenExp   string
 }
 
 func newConfig() *Config {
@@ -27,6 +28,7 @@ func newConfig() *Config {
 		DBname:     os.Getenv("DB_DATABASE"),
 		Port:       os.Getenv("PORT"),
 		Secret:     os.Getenv("SECRET"),
+		TokenExp:   os.Getenv("TOKEN_EXP"),
 	}
 }
 

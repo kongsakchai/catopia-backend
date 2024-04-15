@@ -41,7 +41,7 @@ CREATE TABLE `cats` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
-CREATE TABLE `treatment_types` (
+CREATE TABLE `treatment_type` (
   `id` int NOT NULL AUTO_INCREMENT,
   `treatment_type` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -52,7 +52,7 @@ CREATE TABLE `treatments` (
   `id` int NOT NULL AUTO_INCREMENT,
   `cat_id` int NOT NULL,
   `treatment_type_id` int NOT NULL,
-  `weight` float,
+  `weight` float DEFAULT 0,
   `date` date NOT NULL,
   `location` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
   `vet` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,

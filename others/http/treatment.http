@@ -1,0 +1,42 @@
+@url = http://localhost:8080/api
+@token = 
+
+
+GET {{url}}/treatment/1
+Authorization: Bearer {{token}}
+
+###
+
+GET  {{url}}/treatment/1/1
+Authorization: Bearer {{token}}
+
+###
+
+post {{url}}/treatment/1
+Authorization: Bearer {{token}}
+
+{
+    "treatmentTypeID": 1,
+    "location":"Kmutt",
+    "vet":"Mr. Sakchai",
+    "detail":"Sick",
+    "date":"2000-10-21"
+}
+
+###
+
+put {{url}}/treatment/1/1
+Authorization: Bearer {{token}}
+
+{
+    "treatmentTypeID": 1,
+    "location":"Kmutt",
+    "vet":"Mr. Aut",
+    "detail":"Sick",
+    "date":"2000-10-21"
+}
+
+###
+
+delete {{url}}/treatment/1/2
+Authorization: Bearer {{token}}

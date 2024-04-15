@@ -6,6 +6,7 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -19,14 +20,20 @@ import (
 type sessionUsecase struct {
 	sessionRepo domain.SessionRepository
 	secret      string
+	tokenExp    int
 }
 
 func NewSessionUsecase(sessionRepo domain.SessionRepository) domain.SessionUsecase {
 	cfg := config.Get()
+	tokenExp, err := strconv.Atoi(cfg.TokenExp)
+	if err != nil {
+		tokenExp = 30
+	}
 
 	return &sessionUsecase{
 		sessionRepo: sessionRepo,
 		secret:      cfg.Secret,
+		tokenExp:    tokenExp,
 	}
 }
 
@@ -57,7 +64,8 @@ func (u *sessionUsecase) Sign(id string, expire int64) (string, error) {
 }
 
 func (u *sessionUsecase) Create(ctx context.Context, userID int64) (string, error) {
-	expireDate := time.Now().Add(30 * time.Minute)
+
+	expireDate := time.Now().Add(time.Duration(u.tokenExp) * time.Minute)
 	id := uuid.NewString()
 
 	token, err := u.Sign(id, expireDate.Unix())

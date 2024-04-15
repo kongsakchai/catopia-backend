@@ -52,15 +52,18 @@ func (a *API) initRoute() {
 	sessionRepo := repository.NewSessionRepository()
 	userRepo := repository.NewUserRepository()
 	catRepo := repository.NewCatRepository()
+	treatmentRepo := repository.NewTreatmentRepository()
 
 	sessionUsecase := usecase.NewSessionUsecase(sessionRepo)
 	userUsecase := usecase.NewUserUsecase(userRepo)
 	authUsecase := usecase.NewAuthUsecase(userUsecase, sessionUsecase)
 	catUsecase := usecase.NewCatUsecase(catRepo)
+	treatmentUsecase := usecase.NewTreatmentUsecase(treatmentRepo, catUsecase)
 
 	authHandler := handler.NewAuthHandler(authUsecase)
 	userHandler := handler.NewUserHandler(userUsecase)
 	catHandler := handler.NewCatHandler(catUsecase)
+	treatmentHandler := handler.NewTreatmentHandler(treatmentUsecase)
 
 	api := a.app.Group("/api")
 
@@ -80,4 +83,11 @@ func (a *API) initRoute() {
 	cat.POST("", catHandler.Create)
 	cat.PUT("/:id", catHandler.Update)
 	cat.DELETE("/:id", catHandler.Delete)
+
+	treatment := api.Group("/treatment", middleware.AuthorizationMiddleware(sessionUsecase))
+	treatment.GET("/:cat_id/:id", treatmentHandler.GetByID)
+	treatment.GET("/:cat_id", treatmentHandler.GetByCatID)
+	treatment.POST("/:cat_id", treatmentHandler.Create)
+	treatment.PUT("/:cat_id/:id", treatmentHandler.Update)
+	treatment.DELETE("/:cat_id/:id", treatmentHandler.Delete)
 }
