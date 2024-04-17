@@ -8,11 +8,12 @@ import (
 )
 
 type catUsecase struct {
-	repo domain.CatRepository
+	repo        domain.CatRepository
+	fileUsecase domain.FileUsecase
 }
 
-func NewCatUsecase(repo domain.CatRepository) domain.CatUsecase {
-	return &catUsecase{repo}
+func NewCatUsecase(repo domain.CatRepository, fileUsecase domain.FileUsecase) domain.CatUsecase {
+	return &catUsecase{repo, fileUsecase}
 }
 
 func (u *catUsecase) GetByID(ctx context.Context, id int, userID int) (*domain.CatModel, error) {
@@ -62,6 +63,8 @@ func (u *catUsecase) Update(ctx context.Context, id int, userID int, cat *domain
 	}
 
 	if cat.Profile != nil && cat.Profile != find.Profile {
+		u.fileUsecase.RemoveFile(*find.Profile)
+
 		find.Profile = cat.Profile
 	}
 

@@ -9,11 +9,12 @@ import (
 )
 
 type userUsecase struct {
-	userRepo domain.UserRepository
+	userRepo    domain.UserRepository
+	fileUsecase domain.FileUsecase
 }
 
-func NewUserUsecase(userRepo domain.UserRepository) domain.UserUsecase {
-	return &userUsecase{userRepo}
+func NewUserUsecase(userRepo domain.UserRepository, fileUsecase domain.FileUsecase) domain.UserUsecase {
+	return &userUsecase{userRepo, fileUsecase}
 }
 
 func (u *userUsecase) GetByEmail(ctx context.Context, email string) (*domain.UserModel, error) {
@@ -93,6 +94,8 @@ func (u *userUsecase) Update(ctx context.Context, id int, data *domain.UserModel
 	}
 
 	if data.Profile != nil && data.Profile != user.Profile {
+		u.fileUsecase.RemoveFile(*user.Profile)
+
 		user.Profile = data.Profile
 	}
 

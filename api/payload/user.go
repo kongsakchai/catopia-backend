@@ -8,6 +8,7 @@ type UpdateUser struct {
 	Gender   string         `json:"gender"`
 	Date     *date.JSONDate `json:"date"`
 	Password string         `json:"password"`
+	Profile  string         `json:"profile"`
 }
 
 type UpdatePassword struct {

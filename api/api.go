@@ -54,10 +54,11 @@ func (a *API) initRoute() {
 	catRepo := repository.NewCatRepository()
 	treatmentRepo := repository.NewTreatmentRepository()
 
+	fileUsecase := usecase.NewFileUsecase()
 	sessionUsecase := usecase.NewSessionUsecase(sessionRepo)
-	userUsecase := usecase.NewUserUsecase(userRepo)
+	userUsecase := usecase.NewUserUsecase(userRepo, fileUsecase)
 	authUsecase := usecase.NewAuthUsecase(userUsecase, sessionUsecase)
-	catUsecase := usecase.NewCatUsecase(catRepo)
+	catUsecase := usecase.NewCatUsecase(catRepo, fileUsecase)
 	treatmentUsecase := usecase.NewTreatmentUsecase(treatmentRepo, catUsecase)
 
 	authHandler := handler.NewAuthHandler(authUsecase)
