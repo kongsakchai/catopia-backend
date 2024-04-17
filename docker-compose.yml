@@ -17,6 +17,7 @@ services:
 
   db:
     container_name: db
+    restart: on-failure
     image: mysql
     command: --default-authentication-plugin=caching_sha2_password
     environment:
@@ -53,6 +54,8 @@ services:
     build: .
     ports:
       - 8080:8080
+    volumes:
+      - "./uploads:/uploads"
     networks:
       - app
     depends_on:

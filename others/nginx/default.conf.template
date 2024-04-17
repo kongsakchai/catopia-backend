@@ -44,6 +44,11 @@ server {
         access_log off;
     }
 
+    location /images {
+        proxy_pass http://be/images;
+        access_log off;
+    }
+
     location /adminer {
         proxy_pass http://db;
         proxy_set_header Host $host;

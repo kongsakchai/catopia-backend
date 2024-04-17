@@ -40,11 +40,11 @@ func (api *API) Start() {
 
 	// app.Use(middleware.CORSMiddleware())
 
-	// app.Static("/images", "./upload/images")
+	app.Static("/images", "./uploads")
 
 	api.initRoute()
 
-	app.Run(fmt.Sprintf("127.0.0.1:%s", port))
+	app.Run(fmt.Sprintf(":%s", port))
 }
 
 func (a *API) initRoute() {
@@ -65,29 +65,34 @@ func (a *API) initRoute() {
 	catHandler := handler.NewCatHandler(catUsecase)
 	treatmentHandler := handler.NewTreatmentHandler(treatmentUsecase)
 
+	authMiddleware := middleware.AuthorizationMiddleware(sessionUsecase)
+
 	api := a.app.Group("/api")
 
 	auth := api.Group("/auth")
 	auth.POST("/register", authHandler.Register)
 	auth.POST("/login", authHandler.Login)
-	auth.DELETE("/logout", middleware.AuthorizationMiddleware(sessionUsecase), authHandler.Logout)
+	auth.DELETE("/logout", authMiddleware, authHandler.Logout)
 
-	user := api.Group("/user", middleware.AuthorizationMiddleware(sessionUsecase))
+	user := api.Group("/user", authMiddleware)
 	user.GET("", userHandler.Get)
 	user.PUT("", userHandler.Update)
 	user.PUT("/password", userHandler.UpdatePassword)
 
-	cat := api.Group("/cat", middleware.AuthorizationMiddleware(sessionUsecase))
+	cat := api.Group("/cat", authMiddleware)
 	cat.GET("/:id", catHandler.GetByID)
 	cat.GET("", catHandler.GetAll)
 	cat.POST("", catHandler.Create)
 	cat.PUT("/:id", catHandler.Update)
 	cat.DELETE("/:id", catHandler.Delete)
 
-	treatment := api.Group("/treatment", middleware.AuthorizationMiddleware(sessionUsecase))
+	treatment := api.Group("/treatment", authMiddleware)
 	treatment.GET("/:cat_id/:id", treatmentHandler.GetByID)
 	treatment.GET("/:cat_id", treatmentHandler.GetByCatID)
 	treatment.POST("/:cat_id", treatmentHandler.Create)
 	treatment.PUT("/:cat_id/:id", treatmentHandler.Update)
 	treatment.DELETE("/:cat_id/:id", treatmentHandler.Delete)
+
+	file := api.Group("/file", authMiddleware)
+	file.POST("/upload", handler.NewFileHandler().Upload)
 }

@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/kongsakchai/catopia-backend/api/response"
 	"github.com/kongsakchai/catopia-backend/domain"
+	errs "github.com/kongsakchai/catopia-backend/domain/error"
 )
 
 func AuthorizationMiddleware(sessionUsecase domain.SessionUsecase) gin.HandlerFunc {
@@ -16,6 +17,12 @@ func AuthorizationMiddleware(sessionUsecase domain.SessionUsecase) gin.HandlerFu
 
 		s := c.Request.Header.Get("Authorization")
 		token := strings.TrimPrefix(s, "Bearer ")
+
+		if token == "" {
+			response.NewErrorResponse(c, errs.New(errs.ErrUnauthorized, "Unauthorized", nil))
+			c.Abort()
+			return
+		}
 
 		session, err := sessionUsecase.ValidateToken(c, token)
 		if err != nil {
