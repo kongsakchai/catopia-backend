@@ -85,6 +85,7 @@ func (r *userRepository) Update(ctx context.Context, user *domain.UserModel) err
 		Set("salt", user.Salt).
 		Set("gender", user.Gender).
 		Set("date", user.Date).
+		Set("profile", user.Profile).
 		Where(sq.Eq{"id": user.ID})
 
 	query, args, err := sqlBuild.ToSql()
