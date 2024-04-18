@@ -94,7 +94,9 @@ func (u *userUsecase) Update(ctx context.Context, id int, data *domain.UserModel
 	}
 
 	if data.Profile != nil && data.Profile != user.Profile {
-		u.fileUsecase.RemoveFile(*user.Profile)
+		if user.Profile != nil {
+			u.fileUsecase.RemoveFile(*user.Profile)
+		}
 
 		user.Profile = data.Profile
 	}

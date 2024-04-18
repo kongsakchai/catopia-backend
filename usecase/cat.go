@@ -63,7 +63,9 @@ func (u *catUsecase) Update(ctx context.Context, id int, userID int, cat *domain
 	}
 
 	if cat.Profile != nil && cat.Profile != find.Profile {
-		u.fileUsecase.RemoveFile(*find.Profile)
+		if find.Profile != nil {
+			u.fileUsecase.RemoveFile(*find.Profile)
+		}
 
 		find.Profile = cat.Profile
 	}
