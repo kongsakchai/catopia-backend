@@ -34,6 +34,7 @@ CREATE TABLE `cats` (
   `profile` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
   `date` date NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `last_update` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `user_id` int NOT NULL,
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`),

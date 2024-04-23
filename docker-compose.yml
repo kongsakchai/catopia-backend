@@ -10,15 +10,10 @@ services:
       - ./others/nginx:/etc/nginx/templates
     networks:
       - app
-    depends_on:
-      - db
-      - backend
-      - adminer
 
   db:
     container_name: db
-    restart: on-failure
-    image: mysql
+    image: mysql:8
     command: --default-authentication-plugin=caching_sha2_password
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
@@ -26,7 +21,7 @@ services:
     ports:
       - 3306:3306
     volumes:
-      - "database:/var/lib/mysql"
+      - "./.data/database:/var/lib/mysql"
     networks:
       - app
     env_file:
@@ -49,13 +44,12 @@ services:
   
   backend:
     container_name: backend
-    restart: on-failure
     image: backend
     build: .
     ports:
       - 8080:8080
     volumes:
-      - "./uploads:/uploads"
+      - "./.data/uploads:/root/uploads"
     networks:
       - app
     depends_on:
@@ -67,9 +61,4 @@ services:
 networks:
   app:
     driver: bridge
-
-volumes:
-  database:
-    name: database
-    driver: local
 

@@ -22,6 +22,7 @@ type TreatmentModel struct {
 	Vet             string         `json:"vet" db:"vet"`
 	Detail          string         `json:"detail" db:"detail"`
 	CreatedAt       *date.JSONDate `json:"createdAt" db:"created_at"`
+	Name            string         `json:"name" db:"name"`
 }
 
 type TreatmentRepository interface {

@@ -37,7 +37,10 @@ func (r *treatmentRepository) GetType(ctx context.Context) ([]domain.TreatmentTy
 }
 
 func (r *treatmentRepository) GetByID(ctx context.Context, id int, catID int) (*domain.TreatmentModel, error) {
-	sqlBuild := sq.Select("*").From("treatments").Where(sq.Eq{"id": id, "cat_id": catID})
+	sqlBuild := sq.Select("treatments.*", "treatment_type.treatment_type as name").
+		From("treatments").
+		LeftJoin("treatment_type ON treatments.treatment_type_id = treatment_type.id").
+		Where(sq.Eq{"id": id, "cat_id": catID})
 
 	query, arges, err := sqlBuild.ToSql()
 	if err != nil {
@@ -56,7 +59,10 @@ func (r *treatmentRepository) GetByID(ctx context.Context, id int, catID int) (*
 }
 
 func (r *treatmentRepository) GetByCatID(ctx context.Context, catID int) ([]domain.TreatmentModel, error) {
-	sqlBuild := sq.Select("*").From("treatments").Where(sq.Eq{"cat_id": catID})
+	sqlBuild := sq.Select("treatments.*", "treatment_type.treatment_type as name").
+		From("treatments").
+		LeftJoin("treatment_type ON treatments.treatment_type_id = treatment_type.id").
+		Where(sq.Eq{"cat_id": catID})
 
 	query, arges, err := sqlBuild.ToSql()
 	if err != nil {

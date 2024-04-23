@@ -87,6 +87,8 @@ func (a *API) initRoute() {
 	cat.PUT("/:id", catHandler.Update)
 	cat.DELETE("/:id", catHandler.Delete)
 
+	api.GET("/treatment-type", treatmentHandler.GetType)
+
 	treatment := api.Group("/treatment", authMiddleware)
 	treatment.GET("/:cat_id/:id", treatmentHandler.GetByID)
 	treatment.GET("/:cat_id", treatmentHandler.GetByCatID)
