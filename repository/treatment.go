@@ -40,7 +40,7 @@ func (r *treatmentRepository) GetByID(ctx context.Context, id int, catID int) (*
 	sqlBuild := sq.Select("treatments.*", "treatment_type.treatment_type as name").
 		From("treatments").
 		LeftJoin("treatment_type ON treatments.treatment_type_id = treatment_type.id").
-		Where(sq.Eq{"id": id, "cat_id": catID})
+		Where(sq.Eq{"treatments.id": id, "cat_id": catID})
 
 	query, arges, err := sqlBuild.ToSql()
 	if err != nil {
