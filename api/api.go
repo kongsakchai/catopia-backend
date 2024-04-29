@@ -53,10 +53,12 @@ func (a *API) initRoute() {
 	userRepo := repository.NewUserRepository()
 	catRepo := repository.NewCatRepository()
 	treatmentRepo := repository.NewTreatmentRepository()
+	otpRepository := repository.NewOTPRepository()
 
 	fileUsecase := usecase.NewFileUsecase()
+	otpUsecase := usecase.NewOTPUsecase(otpRepository)
 	sessionUsecase := usecase.NewSessionUsecase(sessionRepo)
-	userUsecase := usecase.NewUserUsecase(userRepo, fileUsecase)
+	userUsecase := usecase.NewUserUsecase(userRepo, fileUsecase, otpUsecase)
 	authUsecase := usecase.NewAuthUsecase(userUsecase, sessionUsecase)
 	catUsecase := usecase.NewCatUsecase(catRepo, fileUsecase)
 	treatmentUsecase := usecase.NewTreatmentUsecase(treatmentRepo, catUsecase)
@@ -75,10 +77,13 @@ func (a *API) initRoute() {
 	auth.POST("/login", authHandler.Login)
 	auth.DELETE("/logout", authMiddleware, authHandler.Logout)
 
-	user := api.Group("/user", authMiddleware)
-	user.GET("", userHandler.Get)
-	user.PUT("", userHandler.Update)
+	user := api.Group("/user")
+	user.GET("", authMiddleware, userHandler.Get)
+	user.PUT("", authMiddleware, userHandler.Update)
+
 	user.PUT("/password", userHandler.UpdatePassword)
+	user.POST("/otp", userHandler.GetOTP)
+	user.POST("/otp/verify", userHandler.VerifyOTP)
 
 	cat := api.Group("/cat", authMiddleware)
 	cat.GET("/:id", catHandler.GetByID)

@@ -12,5 +12,15 @@ type UpdateUser struct {
 }
 
 type UpdatePassword struct {
+	Code     string `json:"code" binding:"required"`
 	Password string `json:"password" binding:"required"`
+}
+
+type GetOTP struct {
+	Username string `json:"username" binding:"required"`
+}
+
+type VerifyOTP struct {
+	Code string `json:"code" binding:"required"`
+	OTP  string `json:"otp" binding:"required"`
 }

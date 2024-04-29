@@ -64,6 +64,38 @@ func (h *UserHandler) Update(c *gin.Context) {
 	response.NewResponse(c, http.StatusOK, "success", nil)
 }
 
+func (h *UserHandler) GetOTP(c *gin.Context) {
+	var req payload.GetOTP
+	if err := c.ShouldBindJSON(&req); err != nil {
+		response.NewErrorResponse(c, errs.New(errs.ErrBadRequest, "Bad Request", err))
+		return
+	}
+
+	code, err := h.userUsecase.CreateOTP(c, req.Username)
+	if err != nil {
+		response.NewErrorResponse(c, err)
+		return
+	}
+
+	response.NewResponse(c, http.StatusOK, "success", gin.H{"code": code})
+}
+
+func (h *UserHandler) VerifyOTP(c *gin.Context) {
+	var req payload.VerifyOTP
+	if err := c.ShouldBindJSON(&req); err != nil {
+		response.NewErrorResponse(c, errs.New(errs.ErrBadRequest, "Bad Request", err))
+		return
+	}
+
+	err := h.userUsecase.VerifyOTP(c, req.Code, req.OTP)
+	if err != nil {
+		response.NewErrorResponse(c, err)
+		return
+	}
+
+	response.NewResponse(c, http.StatusOK, "success", nil)
+}
+
 func (h *UserHandler) UpdatePassword(c *gin.Context) {
 	var req payload.UpdatePassword
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -71,13 +103,7 @@ func (h *UserHandler) UpdatePassword(c *gin.Context) {
 		return
 	}
 
-	id, err := strconv.Atoi(c.Param("user_id"))
-	if err != nil {
-		response.NewErrorResponse(c, errs.New(errs.ErrBadRequest, "Bad Request", err))
-		return
-	}
-
-	err = h.userUsecase.UpdatePassword(c, id, req.Password)
+	err := h.userUsecase.UpdatePasswordWithCode(c, req.Code, req.Password)
 	if err != nil {
 		response.NewErrorResponse(c, err)
 		return

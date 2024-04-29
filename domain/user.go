@@ -33,4 +33,7 @@ type UserUsecase interface {
 	Create(ctx context.Context, user *UserModel) error
 	Update(ctx context.Context, id int, user *UserModel) error
 	UpdatePassword(ctx context.Context, id int, password string) error
+	CreateOTP(ctx context.Context, username string) (string, error)
+	VerifyOTP(ctx context.Context, code string, otp string) error
+	UpdatePasswordWithCode(ctx context.Context, code string, password string) error
 }

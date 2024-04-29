@@ -32,7 +32,7 @@ func (r *catRepository) GetByID(ctx context.Context, id int, userID int) (*domai
 	if err != nil && err == sql.ErrNoRows {
 		return nil, nil
 	} else if err != nil {
-		return nil, fmt.Errorf("get cat by id: cannot build query: %w", err)
+		return nil, fmt.Errorf("get cat by id: cannot execute query: %w", err)
 	}
 
 	return cat, nil
@@ -49,7 +49,7 @@ func (r *catRepository) GetByUserID(ctx context.Context, userID int) ([]domain.C
 	cats := []domain.CatModel{}
 	err = r.db.SelectContext(ctx, &cats, query, arg...)
 	if err != nil {
-		return nil, fmt.Errorf("get cat by user id: cannot build query: %w", err)
+		return nil, fmt.Errorf("get cat by user id:  cannot execute query: %w", err)
 	}
 
 	return cats, nil
