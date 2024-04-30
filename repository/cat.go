@@ -65,14 +65,12 @@ func (r *catRepository) Create(ctx context.Context, cat *domain.CatModel) error 
 		return fmt.Errorf("create cat: cannot build query: %w", err)
 	}
 
-	return r.db.UseTx(ctx, func(tx *db.Tx) error {
-		_, err = tx.NamedExecContext(ctx, query, cat)
-		if err != nil {
-			return fmt.Errorf("create cat: cannot execute query: %w", err)
-		}
+	_, err = r.db.NamedExecContext(ctx, query, cat)
+	if err != nil {
+		return fmt.Errorf("create cat: cannot execute query: %w", err)
+	}
 
-		return nil
-	})
+	return nil
 }
 
 func (r *catRepository) Update(ctx context.Context, cat *domain.CatModel) error {
@@ -89,14 +87,12 @@ func (r *catRepository) Update(ctx context.Context, cat *domain.CatModel) error 
 		return fmt.Errorf("update cat: cannot build query: %w", err)
 	}
 
-	return r.db.UseTx(ctx, func(tx *db.Tx) error {
-		_, err = tx.ExecContext(ctx, query, args...)
-		if err != nil {
-			return fmt.Errorf("update cat: cannot execute query: %w", err)
-		}
+	_, err = r.db.ExecContext(ctx, query, args...)
+	if err != nil {
+		return fmt.Errorf("update cat: cannot execute query: %w", err)
+	}
 
-		return nil
-	})
+	return nil
 }
 
 func (r *catRepository) Delete(ctx context.Context, id int, userID int) error {
@@ -107,12 +103,10 @@ func (r *catRepository) Delete(ctx context.Context, id int, userID int) error {
 		return fmt.Errorf("delete cat: cannot build query: %w", err)
 	}
 
-	return r.db.UseTx(ctx, func(tx *db.Tx) error {
-		_, err = tx.ExecContext(ctx, query, arg...)
-		if err != nil {
-			return fmt.Errorf("delete cat: cannot execute query: %w", err)
-		}
+	_, err = r.db.ExecContext(ctx, query, arg...)
+	if err != nil {
+		return fmt.Errorf("delete cat: cannot execute query: %w", err)
+	}
 
-		return nil
-	})
+	return nil
 }

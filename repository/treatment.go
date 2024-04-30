@@ -88,14 +88,12 @@ func (r *treatmentRepository) Create(ctx context.Context, treatment *domain.Trea
 		return fmt.Errorf("create treatment: cannot build query: %w", err)
 	}
 
-	return r.db.UseTx(ctx, func(tx *db.Tx) error {
-		_, err = tx.ExecContext(ctx, query, arges...)
-		if err != nil {
-			return fmt.Errorf("create treatment: cannot execute query: %w", err)
-		}
+	_, err = r.db.ExecContext(ctx, query, arges...)
+	if err != nil {
+		return fmt.Errorf("create treatment: cannot execute query: %w", err)
+	}
 
-		return nil
-	})
+	return nil
 }
 
 func (r *treatmentRepository) Update(ctx context.Context, treatment *domain.TreatmentModel) error {
@@ -113,14 +111,12 @@ func (r *treatmentRepository) Update(ctx context.Context, treatment *domain.Trea
 		return fmt.Errorf("update treatment: cannot build query: %w", err)
 	}
 
-	return r.db.UseTx(ctx, func(tx *db.Tx) error {
-		_, err = tx.ExecContext(ctx, query, arges...)
-		if err != nil {
-			return fmt.Errorf("update treatment: cannot execute query: %w", err)
-		}
+	_, err = r.db.ExecContext(ctx, query, arges...)
+	if err != nil {
+		return fmt.Errorf("update treatment: cannot execute query: %w", err)
+	}
 
-		return nil
-	})
+	return nil
 }
 
 func (r *treatmentRepository) Delete(ctx context.Context, id int, catID int) error {
@@ -133,12 +129,10 @@ func (r *treatmentRepository) Delete(ctx context.Context, id int, catID int) err
 		return err
 	}
 
-	return r.db.UseTx(ctx, func(tx *db.Tx) error {
-		_, err = tx.ExecContext(ctx, query, arges...)
-		if err != nil {
-			return err
-		}
+	_, err = r.db.ExecContext(ctx, query, arges...)
+	if err != nil {
+		return err
+	}
 
-		return nil
-	})
+	return nil
 }

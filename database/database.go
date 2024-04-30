@@ -1,8 +1,6 @@
 package db
 
 import (
-	"context"
-
 	"github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
 	"github.com/kongsakchai/catopia-backend/config"
@@ -44,24 +42,4 @@ func GetDB() *Database {
 	}
 
 	return database
-}
-
-func (d *Database) UseTx(ctx context.Context, call func(*Tx) error) error {
-	tx, err := d.BeginTxx(ctx, nil)
-	if err != nil {
-		return err
-	}
-	defer tx.Rollback()
-
-	err = call(tx)
-	if err != nil {
-		return err
-	}
-
-	err = tx.Commit()
-	if err != nil {
-		return err
-	}
-
-	return nil
 }

@@ -67,14 +67,12 @@ func (r *userRepository) Create(ctx context.Context, user *domain.UserModel) err
 		return fmt.Errorf("create user: cannot build query: %w", err)
 	}
 
-	return r.db.UseTx(ctx, func(tx *db.Tx) error {
-		_, err := tx.NamedExecContext(ctx, query, user)
-		if err != nil {
-			return fmt.Errorf("create user: cannot execute query: %w", err)
-		}
+	_, err = r.db.NamedExecContext(ctx, query, user)
+	if err != nil {
+		return fmt.Errorf("create user: cannot execute query: %w", err)
+	}
 
-		return nil
-	})
+	return nil
 }
 
 func (r *userRepository) Update(ctx context.Context, user *domain.UserModel) error {
@@ -93,14 +91,12 @@ func (r *userRepository) Update(ctx context.Context, user *domain.UserModel) err
 		return fmt.Errorf("update user: cannot build query: %w", err)
 	}
 
-	return r.db.UseTx(ctx, func(tx *db.Tx) error {
-		_, err := tx.ExecContext(ctx, query, args...)
-		if err != nil {
-			return fmt.Errorf("update user: cannot execute query: %w", err)
-		}
+	_, err = r.db.ExecContext(ctx, query, args...)
+	if err != nil {
+		return fmt.Errorf("update user: cannot execute query: %w", err)
+	}
 
-		return nil
-	})
+	return nil
 }
 
 func (r *userRepository) GetByUsername(ctx context.Context, username string) (*domain.UserModel, error) {

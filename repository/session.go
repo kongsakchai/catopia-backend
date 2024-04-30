@@ -29,14 +29,12 @@ func (r *sessionRepository) Create(ctx context.Context, session *domain.Session)
 		return fmt.Errorf("create session: error building query: %w", err)
 	}
 
-	return r.db.UseTx(ctx, func(tx *db.Tx) error {
-		_, err = tx.NamedExecContext(ctx, query, session)
-		if err != nil {
-			return fmt.Errorf("create session: error executing query: %w", err)
-		}
+	_, err = r.db.NamedExecContext(ctx, query, session)
+	if err != nil {
+		return fmt.Errorf("create session: error executing query: %w", err)
+	}
 
-		return nil
-	})
+	return nil
 }
 
 func (r *sessionRepository) FindByID(ctx context.Context, id string) (*domain.Session, error) {
@@ -70,12 +68,10 @@ func (r *sessionRepository) Delete(ctx context.Context, id string) error {
 		return fmt.Errorf("delete session: error building query: %w", err)
 	}
 
-	return r.db.UseTx(ctx, func(tx *db.Tx) error {
-		_, err = tx.ExecContext(ctx, query, arg...)
-		if err != nil {
-			return fmt.Errorf("delete session: error executing query: %w", err)
-		}
+	_, err = r.db.ExecContext(ctx, query, arg...)
+	if err != nil {
+		return fmt.Errorf("delete session: error executing query: %w", err)
+	}
 
-		return nil
-	})
+	return nil
 }
