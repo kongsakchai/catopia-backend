@@ -57,8 +57,8 @@ func (r *catRepository) GetByUserID(ctx context.Context, userID int) ([]domain.C
 
 func (r *catRepository) Create(ctx context.Context, cat *domain.CatModel) error {
 	sqlBuild := sq.Insert("cats").
-		Columns("name", "gender", "profile", "date", "user_id", "weight").
-		Values(sq.Expr(":name,:gender,:profile,:date,:user_id,:weight"))
+		Columns("name", "gender", "profile", "date", "user_id", "weight", "breeding", "aggression", "shyness", "extraversion").
+		Values(sq.Expr(":name,:gender,:profile,:date,:user_id,:weight,:breeding,:aggression,:shyness,:extraversion"))
 
 	query, _, err := sqlBuild.ToSql()
 	if err != nil {
@@ -80,6 +80,10 @@ func (r *catRepository) Update(ctx context.Context, cat *domain.CatModel) error 
 		Set("profile", cat.Profile).
 		Set("date", cat.Date).
 		Set("weight", cat.Weight).
+		Set("breeding", cat.Breeding).
+		Set("aggression", cat.Aggression).
+		Set("shyness", cat.Shyness).
+		Set("extraversion", cat.Extraversion).
 		Where(sq.Eq{"id": cat.ID, "user_id": cat.UserID})
 
 	query, args, err := sqlBuild.ToSql()

@@ -7,15 +7,19 @@ import (
 )
 
 type CatModel struct {
-	ID         int64          `json:"id" db:"id"`
-	Name       string         `json:"name" db:"name"`
-	Weight     float64        `json:"weight" db:"weight"`
-	Gender     string         `json:"gender" db:"gender"`
-	Profile    *string        `json:"profile" db:"profile"`
-	Date       *date.JSONDate `json:"date" db:"date"`
-	CreateAt   *date.JSONDate `json:"createAt" db:"created_at"`
-	UserID     int64          `json:"userId" db:"user_id"`
-	LastUpdate *date.JSONDate `json:"last_update" db:"last_update"`
+	ID           int64          `json:"id" db:"id"`
+	Name         string         `json:"name" db:"name"`
+	Weight       float64        `json:"weight" db:"weight"`
+	Gender       string         `json:"gender" db:"gender"`
+	Profile      *string        `json:"profile" db:"profile"`
+	Date         *date.JSONDate `json:"date" db:"date"`
+	CreateAt     *date.JSONDate `json:"createAt" db:"created_at"`
+	UserID       int64          `json:"userId" db:"user_id"`
+	LastUpdate   *date.JSONDate `json:"last_update" db:"last_update"`
+	Breeding     string         `json:"breeding" db:"breeding"`
+	Aggression   int            `json:"aggression" db:"aggression"`
+	Shyness      int            `json:"shyness" db:"shyness"`
+	Extraversion int            `json:"extraversion" db:"extraversion"`
 }
 
 type CatRepository interface {

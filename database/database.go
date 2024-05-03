@@ -18,14 +18,12 @@ func newDB() *Database {
 	cfg := config.Get()
 
 	dbCfg := &mysql.Config{
-		User:                 cfg.DBUser,
-		Passwd:               cfg.DBPassword,
-		Net:                  "tcp",
-		Addr:                 cfg.DBHost + ":" + cfg.DBPort,
-		DBName:               cfg.DBname,
-		AllowNativePasswords: true,
-		ParseTime:            true,
-		MultiStatements:      true,
+		User:      cfg.DBUser,
+		Passwd:    cfg.DBPassword,
+		Net:       "tcp",
+		Addr:      cfg.DBHost + ":" + cfg.DBPort,
+		DBName:    cfg.DBname,
+		ParseTime: true,
 	}
 
 	db, err := sqlx.Connect("mysql", dbCfg.FormatDSN())
