@@ -2,136 +2,114 @@ package repository
 
 import (
 	"context"
-	"database/sql"
-	"fmt"
 
 	sq "github.com/Masterminds/squirrel"
 	db "github.com/kongsakchai/catopia-backend/database"
 	"github.com/kongsakchai/catopia-backend/domain"
+	errs "github.com/kongsakchai/catopia-backend/domain/error"
 )
 
 type treatmentRepository struct {
 	db *db.Database
 }
 
-func NewTreatmentRepository() domain.TreatmentRepository {
-	db := db.GetDB()
+func NewTreatmentRepository(db *db.Database) domain.TreatmentRepository {
 	return &treatmentRepository{db}
 }
-
-func (r *treatmentRepository) GetType(ctx context.Context) ([]domain.TreatmentTypeModel, error) {
-	sqlBuild := sq.Select("*").From("treatment_type")
-
-	query, _, err := sqlBuild.ToSql()
+func (r *treatmentRepository) GetType(ctx context.Context) ([]domain.TreatmentType, error) {
+	getSql, _, err := sq.Select("*").From("treatment_type").ToSql()
 	if err != nil {
-		return nil, fmt.Errorf("get treatment type: cannot build query: %w", err)
+		return nil, errs.NewError(errs.ErrTreatmentTypeGet, err)
 	}
 
-	var treatmentType []domain.TreatmentTypeModel
-	err = r.db.SelectContext(ctx, &treatmentType, query)
+	var treatmentType []domain.TreatmentType
+	err = r.db.SelectContext(ctx, &treatmentType, getSql)
 	if err != nil {
-		return nil, fmt.Errorf("get treatment type: cannot execute query: %w", err)
+		return nil, errs.NewError(errs.ErrTreatmentTypeGet, db.HandlerError(err))
 	}
 
 	return treatmentType, nil
 }
 
-func (r *treatmentRepository) GetByID(ctx context.Context, id int, catID int) (*domain.TreatmentModel, error) {
-	sqlBuild := sq.Select("treatments.*", "treatment_type.treatment_type as name").
-		From("treatments").
-		LeftJoin("treatment_type ON treatments.treatment_type_id = treatment_type.id").
-		Where(sq.Eq{"treatments.id": id, "cat_id": catID})
-
-	query, arges, err := sqlBuild.ToSql()
+func (r *treatmentRepository) GetByID(ctx context.Context, id int64, catID int64) (*domain.Treatment, error) {
+	getSql, args, err := sq.Select("*").From("treatment").Where(sq.Eq{"id": id, "cat_id": catID}).ToSql()
 	if err != nil {
-		return nil, fmt.Errorf("get treatment by id: cannot build query: %w", err)
+		return nil, errs.NewError(errs.ErrTreatmentGetByID, err)
 	}
 
-	var treatment domain.TreatmentModel
-	err = r.db.GetContext(ctx, &treatment, query, arges...)
-	if err == sql.ErrNoRows {
-		return nil, nil
-	} else if err != nil {
-		return nil, fmt.Errorf("get treatment by id: cannot execute query: %w", err)
+	treatment := &domain.Treatment{}
+	err = r.db.GetContext(ctx, treatment, getSql, args...)
+	if err != nil {
+		return nil, errs.NewError(errs.ErrTreatmentGetByID, db.HandlerError(err))
 	}
 
-	return &treatment, nil
+	return treatment, nil
 }
 
-func (r *treatmentRepository) GetByCatID(ctx context.Context, catID int) ([]domain.TreatmentModel, error) {
-	sqlBuild := sq.Select("treatments.*", "treatment_type.treatment_type as name").
-		From("treatments").
-		LeftJoin("treatment_type ON treatments.treatment_type_id = treatment_type.id").
-		Where(sq.Eq{"cat_id": catID})
-
-	query, arges, err := sqlBuild.ToSql()
+func (r *treatmentRepository) GetByCatID(ctx context.Context, catID int64) ([]domain.Treatment, error) {
+	getSql, args, err := sq.Select("*").From("treatment").Where(sq.Eq{"cat_id": catID}).ToSql()
 	if err != nil {
-		return nil, fmt.Errorf("get treatment by cat id: cannot build query: %w", err)
+		return nil, errs.NewError(errs.ErrTreatmentGetByID, err)
 	}
 
-	var treatments []domain.TreatmentModel
-	err = r.db.SelectContext(ctx, &treatments, query, arges...)
+	var treatment []domain.Treatment
+	err = r.db.SelectContext(ctx, &treatment, getSql, args...)
 	if err != nil {
-		return nil, fmt.Errorf("get treatment by cat id: cannot execute query: %w", err)
+		return nil, errs.NewError(errs.ErrTreatmentGetByID, db.HandlerError(err))
 	}
 
-	return treatments, nil
+	return treatment, nil
 }
 
-func (r *treatmentRepository) Create(ctx context.Context, treatment *domain.TreatmentModel) error {
-	sqlBuild := sq.Insert("treatments").
-		Columns("cat_id", "treatment_type_id", "weight", "date", "location", "vet", "detail").
-		Values(treatment.CatID, treatment.TreatmentTypeID, treatment.Weight, treatment.Date, treatment.Location, treatment.Vet, treatment.Detail)
+func (r *treatmentRepository) Create(ctx context.Context, treatment *domain.Treatment) error {
+	insertSql, args, err := sq.Insert("treatment").
+		Columns("cat_id", "treatment_type_id", "date", "location", "vet", "detail").
+		Values(treatment.CatID, treatment.TreatmentTypeID, treatment.Date, treatment.Location, treatment.Vet, treatment.Detail).
+		ToSql()
 
-	query, arges, err := sqlBuild.ToSql()
 	if err != nil {
-		return fmt.Errorf("create treatment: cannot build query: %w", err)
+		return errs.NewError(errs.ErrTreatmentCreate, err)
 	}
 
-	_, err = r.db.ExecContext(ctx, query, arges...)
+	_, err = r.db.ExecContext(ctx, insertSql, args...)
 	if err != nil {
-		return fmt.Errorf("create treatment: cannot execute query: %w", err)
+		return errs.NewError(errs.ErrTreatmentCreate, db.HandlerError(err))
 	}
 
 	return nil
 }
 
-func (r *treatmentRepository) Update(ctx context.Context, treatment *domain.TreatmentModel) error {
-	sqlBuild := sq.Update("treatments").
+func (r *treatmentRepository) Update(ctx context.Context, treatment *domain.Treatment) error {
+	updateSql, args, err := sq.Update("treatment").
 		Set("treatment_type_id", treatment.TreatmentTypeID).
-		Set("weight", treatment.Weight).
 		Set("date", treatment.Date).
 		Set("location", treatment.Location).
 		Set("vet", treatment.Vet).
 		Set("detail", treatment.Detail).
-		Where(sq.Eq{"id": treatment.ID, "cat_id": treatment.CatID})
+		Where(sq.Eq{"id": treatment.ID, "cat_id": treatment.CatID}).
+		ToSql()
 
-	query, arges, err := sqlBuild.ToSql()
 	if err != nil {
-		return fmt.Errorf("update treatment: cannot build query: %w", err)
+		return errs.NewError(errs.ErrTreatmentUpdate, err)
 	}
 
-	_, err = r.db.ExecContext(ctx, query, arges...)
+	_, err = r.db.ExecContext(ctx, updateSql, args...)
 	if err != nil {
-		return fmt.Errorf("update treatment: cannot execute query: %w", err)
+		return errs.NewError(errs.ErrTreatmentUpdate, db.HandlerError(err))
 	}
 
 	return nil
 }
 
-func (r *treatmentRepository) Delete(ctx context.Context, id int, catID int) error {
-	fmt.Println(id, catID)
-
-	sqlBuild := sq.Delete("treatments").Where(sq.Eq{"id": id, "cat_id": catID})
-
-	query, arges, err := sqlBuild.ToSql()
+func (r *treatmentRepository) Delete(ctx context.Context, id int64) error {
+	deleteSql, args, err := sq.Delete("treatment").Where(sq.Eq{"id": id}).ToSql()
 	if err != nil {
-		return err
+		return errs.NewError(errs.ErrTreatmentDelete, err)
 	}
 
-	_, err = r.db.ExecContext(ctx, query, arges...)
+	_, err = r.db.ExecContext(ctx, deleteSql, args...)
 	if err != nil {
-		return err
+		return errs.NewError(errs.ErrTreatmentDelete, db.HandlerError(err))
 	}
 
 	return nil

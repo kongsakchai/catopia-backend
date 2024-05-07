@@ -1,25 +1,43 @@
 package response
 
 import (
-	"errors"
+	"net/http"
 
-	"github.com/gin-gonic/gin"
 	errs "github.com/kongsakchai/catopia-backend/domain/error"
 )
 
-func NewErrorResponse(c *gin.Context, err error) {
-	var unwarp *errs.Error
+var ErrCodeToHTTPStatus = map[int]int{
+	errs.ErrNotFound:   http.StatusNotFound,
+	errs.ErrConflict:   http.StatusConflict,
+	errs.ErrBadRequest: http.StatusBadRequest,
 
-	if errors.As(err, &unwarp) {
-		c.JSON(unwarp.Code, &Response{
-			Code:    unwarp.Code,
-			Message: unwarp.Message,
-		})
-		return
-	}
+	errs.ErrTransaction: http.StatusBadRequest,
+	errs.ErrRollback:    http.StatusBadRequest,
+	errs.ErrCommit:      http.StatusBadRequest,
 
-	c.AbortWithStatusJSON(errs.ErrInternal, &Response{
-		Code:    errs.ErrInternal,
-		Message: "Internal Server Error",
-	})
+	errs.ErrUserGetByEmail:     http.StatusBadRequest,
+	errs.ErrUserGetByID:        http.StatusBadRequest,
+	errs.ErrUserCreate:         http.StatusBadRequest,
+	errs.ErrUserUpdate:         http.StatusBadRequest,
+	errs.ErrUserGetByUsername:  http.StatusBadRequest,
+	errs.ErrUserUpdatePassword: http.StatusBadRequest,
+
+	errs.ErrTreatmentTypeGet: http.StatusBadRequest,
+	errs.ErrTreatmentGetByID: http.StatusBadRequest,
+	errs.ErrTreatmentCreate:  http.StatusBadRequest,
+	errs.ErrTreatmentUpdate:  http.StatusBadRequest,
+	errs.ErrTreatmentDelete:  http.StatusBadRequest,
+
+	errs.ErrSessionCreate: http.StatusBadRequest,
+	errs.ErrSessionGet:    http.StatusBadRequest,
+	errs.ErrSessionDelete: http.StatusBadRequest,
+
+	errs.ErrCatGetByID:     http.StatusBadRequest,
+	errs.ErrCatGetByUserID: http.StatusBadRequest,
+	errs.ErrCatCreate:      http.StatusBadRequest,
+	errs.ErrCatUpdate:      http.StatusBadRequest,
+	errs.ErrCatDelete:      http.StatusBadRequest,
+	errs.ErrCatUpdateGroup: http.StatusBadRequest,
+
+	errs.ErrCatGroup: http.StatusBadRequest,
 }

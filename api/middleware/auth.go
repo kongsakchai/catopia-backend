@@ -19,14 +19,14 @@ func AuthorizationMiddleware(sessionUsecase domain.SessionUsecase) gin.HandlerFu
 		token := strings.TrimPrefix(s, "Bearer ")
 
 		if token == "" {
-			response.NewErrorResponse(c, errs.New(errs.ErrUnauthorized, "Unauthorized", nil))
+			response.NewError(c, errs.NewError(errs.ErrUnauthorized, fmt.Errorf("Unauthorized")))
 			c.Abort()
 			return
 		}
 
 		session, err := sessionUsecase.ValidateToken(c, token)
 		if err != nil {
-			response.NewErrorResponse(c, err)
+			response.NewError(c, err)
 			c.Abort()
 			return
 		}

@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/kongsakchai/catopia-backend/domain"
 	errs "github.com/kongsakchai/catopia-backend/domain/error"
@@ -19,62 +20,62 @@ func NewTreatmentUsecase(t domain.TreatmentRepository, c domain.CatUsecase) doma
 	}
 }
 
-func (t *treatmentUsecase) GetType(ctx context.Context) ([]domain.TreatmentTypeModel, error) {
+func (t *treatmentUsecase) GetType(ctx context.Context) ([]domain.TreatmentType, error) {
 	data, err := t.treatmentRepo.GetType(ctx)
 	if err != nil {
-		return nil, errs.New(errs.ErrInternal, "Internal server error", err)
+		return nil, err
 	}
 
 	return data, nil
 }
 
-func (t *treatmentUsecase) GetByID(ctx context.Context, id int, catID int) (*domain.TreatmentModel, error) {
+func (t *treatmentUsecase) GetByID(ctx context.Context, id int64, catID int64) (*domain.Treatment, error) {
 	data, err := t.treatmentRepo.GetByID(ctx, id, catID)
 	if err != nil {
-		return nil, errs.New(errs.ErrInternal, "Internal server error", err)
+		return nil, err
 	}
 
 	if data == nil {
-		return nil, errs.New(errs.ErrNotFound, "Treatment not found", nil)
+		return nil, errs.NewError(errs.ErrNotFound, fmt.Errorf("Treatment not found"))
 	}
 
 	return data, nil
 }
 
-func (t *treatmentUsecase) GetByCatID(ctx context.Context, catID int, userID int) ([]domain.TreatmentModel, error) {
+func (t *treatmentUsecase) GetByCatID(ctx context.Context, catID int64, userID int64) ([]domain.Treatment, error) {
 	cat, err := t.catUsecase.GetByID(ctx, catID, userID)
 	if err != nil {
-		return nil, errs.New(errs.ErrInternal, "Internal server error", err)
+		return nil, err
 	}
 
 	if cat == nil {
-		return nil, errs.New(errs.ErrNotFound, "Cat not found", nil)
+		return nil, errs.NewError(errs.ErrNotFound, fmt.Errorf("Cat not found"))
 	}
 
-	data, err := t.treatmentRepo.GetByCatID(ctx, int(cat.ID))
+	data, err := t.treatmentRepo.GetByCatID(ctx, cat.ID)
 	if err != nil {
-		return nil, errs.New(errs.ErrInternal, "Internal server error", err)
+		return nil, err
 	}
 
 	return data, nil
 }
 
-func (t *treatmentUsecase) Create(ctx context.Context, catID int, userID int, treatment *domain.TreatmentModel) error {
-	cat, err := t.catUsecase.GetByID(ctx, catID, userID)
+func (t *treatmentUsecase) Create(ctx context.Context, catID int64, userID int64, treatment *domain.Treatment) error {
+	_, err := t.catUsecase.GetByID(ctx, catID, userID)
 	if err != nil {
 		return err
 	}
 
-	treatment.CatID = int(cat.ID)
+	treatment.CatID = catID
 	err = t.treatmentRepo.Create(ctx, treatment)
 	if err != nil {
-		return errs.New(errs.ErrInternal, "Internal server error", err)
+		return err
 	}
 
 	return nil
 }
 
-func (t *treatmentUsecase) Update(ctx context.Context, id int, catID int, treatment *domain.TreatmentModel) error {
+func (t *treatmentUsecase) Update(ctx context.Context, id int64, catID int64, treatment *domain.Treatment) error {
 	find, err := t.GetByID(ctx, id, catID)
 	if err != nil {
 		return err
@@ -102,21 +103,21 @@ func (t *treatmentUsecase) Update(ctx context.Context, id int, catID int, treatm
 
 	err = t.treatmentRepo.Update(ctx, find)
 	if err != nil {
-		return errs.New(errs.ErrInternal, "Internal server error", err)
+		return err
 	}
 
 	return nil
 }
 
-func (t *treatmentUsecase) Delete(ctx context.Context, id int, catID int) error {
-	treatment, err := t.GetByID(ctx, id, catID)
+func (t *treatmentUsecase) Delete(ctx context.Context, id int64, catID int64) error {
+	_, err := t.GetByID(ctx, id, catID)
 	if err != nil {
 		return err
 	}
 
-	err = t.treatmentRepo.Delete(ctx, id, int(treatment.CatID))
+	err = t.treatmentRepo.Delete(ctx, id)
 	if err != nil {
-		return errs.New(errs.ErrInternal, "Internal server error", err)
+		return err
 	}
 
 	return nil

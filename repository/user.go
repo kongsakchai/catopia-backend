@@ -2,118 +2,123 @@ package repository
 
 import (
 	"context"
-	"database/sql"
-	"fmt"
 
 	sq "github.com/Masterminds/squirrel"
 	db "github.com/kongsakchai/catopia-backend/database"
 	"github.com/kongsakchai/catopia-backend/domain"
+	errs "github.com/kongsakchai/catopia-backend/domain/error"
 )
 
 type userRepository struct {
 	db *db.Database
 }
 
-func NewUserRepository() domain.UserRepository {
-	db := db.GetDB()
+func NewUserRepository(db *db.Database) domain.UserRepository {
 	return &userRepository{db}
 }
 
-func (r *userRepository) GetByEmail(ctx context.Context, email string) (*domain.UserModel, error) {
-	sqlBuild := sq.Select("*").From("users").Where(sq.Eq{"email": email})
-
-	query, arg, err := sqlBuild.ToSql()
+func (u *userRepository) GetByEmail(ctx context.Context, email string) (*domain.User, error) {
+	getSql, args, err := sq.Select("*").From("user").Where(sq.Eq{"email": email}).ToSql()
 	if err != nil {
-		return nil, fmt.Errorf("get user by email: cannot build query: %w", err)
+		return nil, errs.NewError(errs.ErrUserGetByEmail, err)
 	}
 
-	user := &domain.UserModel{}
-	err = r.db.GetContext(ctx, user, query, arg...)
-	if err != nil && err == sql.ErrNoRows {
-		return nil, nil
-	} else if err != nil {
-		return nil, fmt.Errorf("get user by email: cannot execute query: %w", err)
+	user := &domain.User{}
+	err = u.db.GetContext(ctx, user, getSql, args...)
+	if err != nil {
+		return nil, errs.NewError(errs.ErrUserGetByEmail, db.HandlerError(err))
 	}
 
 	return user, nil
 }
 
-func (r *userRepository) GetByID(ctx context.Context, id int) (*domain.UserModel, error) {
-	sqlBuild := sq.Select("*").From("users").Where(sq.Eq{"id": id})
-
-	query, arg, err := sqlBuild.ToSql()
+func (u *userRepository) GetByUsername(ctx context.Context, username string) (*domain.User, error) {
+	getSql, args, err := sq.Select("*").From("user").Where(sq.Eq{"username": username}).ToSql()
 	if err != nil {
-		return nil, fmt.Errorf("get user by id: cannot build query: %w", err)
+		return nil, errs.NewError(errs.ErrUserGetByUsername, err)
 	}
 
-	user := &domain.UserModel{}
-	err = r.db.GetContext(ctx, user, query, arg...)
-	if err != nil && err == sql.ErrNoRows {
-		return nil, nil
-	} else if err != nil {
-		return nil, fmt.Errorf("get user by id: cannot execute query: %w", err)
+	user := &domain.User{}
+	err = u.db.GetContext(ctx, user, getSql, args...)
+	if err != nil {
+		return nil, errs.NewError(errs.ErrUserGetByUsername, db.HandlerError(err))
 	}
 
 	return user, nil
 }
 
-func (r *userRepository) Create(ctx context.Context, user *domain.UserModel) error {
-	sqlBuild := sq.Insert("users").
-		Columns("username", "password", "email", "salt", "gender", "date").
-		Values(sq.Expr(":username,:password,:email,:salt,:gender,:date"))
-
-	query, _, err := sqlBuild.ToSql()
+func (u *userRepository) GetByID(ctx context.Context, id int64) (*domain.User, error) {
+	getSql, args, err := sq.Select("*").From("user").Where(sq.Eq{"id": id}).ToSql()
 	if err != nil {
-		return fmt.Errorf("create user: cannot build query: %w", err)
+		return nil, errs.NewError(errs.ErrUserGetByID, err)
 	}
 
-	_, err = r.db.NamedExecContext(ctx, query, user)
+	user := &domain.User{}
+	err = u.db.GetContext(ctx, user, getSql, args...)
 	if err != nil {
-		return fmt.Errorf("create user: cannot execute query: %w", err)
+		return nil, errs.NewError(errs.ErrUserGetByID, db.HandlerError(err))
+	}
+
+	return user, nil
+}
+
+func (u *userRepository) Create(ctx context.Context, user *domain.User) error {
+	insertSql, args, err := sq.Insert("user").
+		Columns("username", "password", "email", "salt", "gender", "profile", "date").
+		Values(user.Username, user.Password, user.Email, user.Salt, user.Gender, user.Profile, user.Date).
+		ToSql()
+
+	if err != nil {
+		return errs.NewError(errs.ErrUserCreate, err)
+	}
+
+	_, err = u.db.ExecContext(ctx, insertSql, args...)
+	if err != nil {
+		return errs.NewError(errs.ErrUserCreate, db.HandlerError(err))
 	}
 
 	return nil
 }
 
-func (r *userRepository) Update(ctx context.Context, user *domain.UserModel) error {
-	sqlBuild := sq.Update("users").
+func (u *userRepository) Update(ctx context.Context, user *domain.User) error {
+	updateSql, args, err := sq.Update("user").
 		Set("username", user.Username).
-		Set("password", user.Password).
 		Set("email", user.Email).
+		Set("password", user.Password).
 		Set("salt", user.Salt).
 		Set("gender", user.Gender).
-		Set("date", user.Date).
 		Set("profile", user.Profile).
-		Where(sq.Eq{"id": user.ID})
+		Set("date", user.Date).
+		Where(sq.Eq{"id": user.ID}).
+		ToSql()
 
-	query, args, err := sqlBuild.ToSql()
 	if err != nil {
-		return fmt.Errorf("update user: cannot build query: %w", err)
+		return errs.NewError(errs.ErrUserUpdate, err)
 	}
 
-	_, err = r.db.ExecContext(ctx, query, args...)
+	_, err = u.db.ExecContext(ctx, updateSql, args...)
 	if err != nil {
-		return fmt.Errorf("update user: cannot execute query: %w", err)
+		return errs.NewError(errs.ErrUserUpdate, db.HandlerError(err))
 	}
 
 	return nil
 }
 
-func (r *userRepository) GetByUsername(ctx context.Context, username string) (*domain.UserModel, error) {
-	sqlBuild := sq.Select("*").From("users").Where(sq.Eq{"username": username})
+func (u *userRepository) UpdatePassword(ctx context.Context, id int64, password string, salt string) error {
+	updateSql, args, err := sq.Update("user").
+		Set("password", password).
+		Set("salt", salt).
+		Where(sq.Eq{"id": id}).
+		ToSql()
 
-	query, arg, err := sqlBuild.ToSql()
 	if err != nil {
-		return nil, fmt.Errorf("get user by username: cannot build query: %w", err)
+		return errs.NewError(errs.ErrUserUpdatePassword, err)
 	}
 
-	user := &domain.UserModel{}
-	err = r.db.GetContext(ctx, user, query, arg...)
-	if err != nil && err == sql.ErrNoRows {
-		return nil, nil
-	} else if err != nil {
-		return nil, fmt.Errorf("get user by username: cannot execute query: %w", err)
+	_, err = u.db.ExecContext(ctx, updateSql, args...)
+	if err != nil {
+		return errs.NewError(errs.ErrUserUpdatePassword, db.HandlerError(err))
 	}
 
-	return user, nil
+	return nil
 }

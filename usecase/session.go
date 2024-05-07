@@ -57,7 +57,7 @@ func (u *sessionUsecase) Sign(id string, expire int64) (string, error) {
 
 	token, err := payload.SignedString([]byte(signature))
 	if err != nil {
-		return "", errs.New(errs.ErrInternal, "Internal server error", err)
+		return "", err
 	}
 
 	return token, nil
@@ -82,7 +82,7 @@ func (u *sessionUsecase) Create(ctx context.Context, userID int64) (string, erro
 
 	err = u.sessionRepo.Create(ctx, session)
 	if err != nil {
-		return "", errs.New(errs.ErrInternal, "Internal server error", err)
+		return "", err
 	}
 
 	return token, nil
@@ -91,11 +91,11 @@ func (u *sessionUsecase) Create(ctx context.Context, userID int64) (string, erro
 func (u *sessionUsecase) FindByID(ctx context.Context, id string) (*domain.Session, error) {
 	session, err := u.sessionRepo.FindByID(ctx, id)
 	if err != nil {
-		return nil, errs.New(errs.ErrInternal, "Internal server error", err)
+		return nil, err
 	}
 
 	if session == nil {
-		return nil, errs.New(errs.ErrUnauthorized, "Token not found", nil)
+		return nil, errs.NewError(errs.ErrNotFound, fmt.Errorf("Session not found"))
 	}
 
 	return session, nil
@@ -105,7 +105,7 @@ func (u *sessionUsecase) FindByID(ctx context.Context, id string) (*domain.Sessi
 func (u *sessionUsecase) Delete(ctx context.Context, id string) error {
 	err := u.sessionRepo.Delete(ctx, id)
 	if err != nil {
-		return errs.New(errs.ErrInternal, "Internal server error", err)
+		return err
 	}
 
 	return nil
@@ -122,7 +122,7 @@ func (u *sessionUsecase) UnSign(token string) (string, error) {
 	})
 
 	if err != nil {
-		return "", errs.New(errs.ErrUnauthorized, "Invalid token", err)
+		return "", err
 	}
 
 	return claims["sub"].(string), nil
@@ -142,7 +142,7 @@ func (u *sessionUsecase) ValidateToken(ctx context.Context, token string) (*doma
 	if time.Now().After(time.Time(session.ExpiredAt)) {
 		u.Delete(ctx, session.ID)
 
-		return nil, errs.New(errs.ErrUnauthorized, "Token expired", nil)
+		return nil, err
 	}
 
 	return session, nil

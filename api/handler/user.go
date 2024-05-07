@@ -8,8 +8,7 @@ import (
 	"github.com/kongsakchai/catopia-backend/api/payload"
 	"github.com/kongsakchai/catopia-backend/api/response"
 	"github.com/kongsakchai/catopia-backend/domain"
-	errs "github.com/kongsakchai/catopia-backend/domain/error"
-	"github.com/kongsakchai/catopia-backend/utils/data"
+	"github.com/kongsakchai/catopia-backend/utils/mapping"
 )
 
 type UserHandler struct {
@@ -21,93 +20,77 @@ func NewUserHandler(userUsecase domain.UserUsecase) *UserHandler {
 }
 
 func (h *UserHandler) Get(c *gin.Context) {
-	id, err := strconv.Atoi(c.Param("user_id"))
+	id, err := strconv.ParseInt(c.Param("user_id"), 10, 64)
 	if err != nil {
-		response.NewErrorResponse(c, errs.New(errs.ErrBadRequest, "Bad Request", err))
+		response.NewError(c, err)
 		return
 	}
 
 	data, err := h.userUsecase.GetByID(c, id)
 	if err != nil {
-		response.NewErrorResponse(c, err)
+		response.NewError(c, err)
 		return
 	}
 
-	response.NewResponse(c, http.StatusOK, "success", data)
+	response.New(c, http.StatusOK, "success", data)
 }
 
 func (h *UserHandler) Update(c *gin.Context) {
 	var req payload.UpdateUser
 	if err := c.ShouldBindJSON(&req); err != nil {
-		response.NewErrorResponse(c, errs.New(errs.ErrBadRequest, "Bad Request", err))
+		response.NewError(c, err)
 		return
 	}
 
-	id, err := strconv.Atoi(c.Param("user_id"))
+	id, err := strconv.ParseInt(c.Param("user_id"), 10, 64)
 	if err != nil {
-		response.NewErrorResponse(c, errs.New(errs.ErrBadRequest, "Bad Request", err))
+		response.NewError(c, err)
 		return
 	}
 
-	data, err := data.Mapping[domain.UserModel](&req)
+	data, err := mapping.Mapping[domain.User](&req)
 	if err != nil {
-		response.NewErrorResponse(c, err)
+		response.NewError(c, err)
 		return
 	}
 
 	err = h.userUsecase.Update(c, id, data)
 	if err != nil {
-		response.NewErrorResponse(c, err)
+		response.NewError(c, err)
 		return
 	}
 
-	response.NewResponse(c, http.StatusOK, "success", nil)
+	response.New(c, http.StatusOK, "success", nil)
 }
 
-func (h *UserHandler) GetOTP(c *gin.Context) {
+func (h *UserHandler) ForgetPassword(c *gin.Context) {
 	var req payload.GetOTP
 	if err := c.ShouldBindJSON(&req); err != nil {
-		response.NewErrorResponse(c, errs.New(errs.ErrBadRequest, "Bad Request", err))
+		response.NewError(c, err)
 		return
 	}
 
-	code, err := h.userUsecase.CreateOTP(c, req.Username)
+	code, err := h.userUsecase.ForgetPassword(c, req.Username)
 	if err != nil {
-		response.NewErrorResponse(c, err)
+		response.NewError(c, err)
 		return
 	}
 
-	response.NewResponse(c, http.StatusOK, "success", gin.H{"code": code})
+	response.New(c, http.StatusOK, "success", gin.H{"code": code})
 }
 
-func (h *UserHandler) VerifyOTP(c *gin.Context) {
-	var req payload.VerifyOTP
-	if err := c.ShouldBindJSON(&req); err != nil {
-		response.NewErrorResponse(c, errs.New(errs.ErrBadRequest, "Bad Request", err))
-		return
-	}
-
-	err := h.userUsecase.VerifyOTP(c, req.Code, req.OTP)
-	if err != nil {
-		response.NewErrorResponse(c, err)
-		return
-	}
-
-	response.NewResponse(c, http.StatusOK, "success", nil)
-}
-
-func (h *UserHandler) UpdatePassword(c *gin.Context) {
+func (h *UserHandler) ResetPassword(c *gin.Context) {
 	var req payload.UpdatePassword
 	if err := c.ShouldBindJSON(&req); err != nil {
-		response.NewErrorResponse(c, errs.New(errs.ErrBadRequest, "Bad Request", err))
+		response.NewError(c, err)
 		return
 	}
 
-	err := h.userUsecase.UpdatePasswordWithCode(c, req.Code, req.Password)
+	err := h.userUsecase.ResetPassword(c, req.Code, req.Password)
 	if err != nil {
-		response.NewErrorResponse(c, err)
+		response.NewError(c, err)
 		return
 	}
 
-	response.NewResponse(c, http.StatusCreated, "success", nil)
+	response.New(c, http.StatusCreated, "success", nil)
 }

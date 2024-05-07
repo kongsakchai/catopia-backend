@@ -18,6 +18,7 @@ type SessionRepository interface {
 	Create(ctx context.Context, session *Session) error
 	FindByID(ctx context.Context, id string) (*Session, error)
 	Delete(ctx context.Context, id string) error
+	ClearExpired(ctx context.Context) error
 }
 
 type SessionUsecase interface {

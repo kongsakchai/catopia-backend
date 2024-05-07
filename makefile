@@ -3,3 +3,18 @@ start:
 
 stop:
 	docker compose down
+
+run:
+	docker run --name backend  --env-file ./.env --network host -i -d backend
+
+build:
+	docker build -t backend .
+
+rm:
+	docker rm backend -f
+
+rmi:
+	docker rmi backend
+
+exec:
+	docker exec -it backend bash

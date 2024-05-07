@@ -2,6 +2,8 @@ package usecase
 
 import (
 	"context"
+	"fmt"
+	"strings"
 
 	"github.com/kongsakchai/catopia-backend/domain"
 	errs "github.com/kongsakchai/catopia-backend/domain/error"
@@ -18,165 +20,139 @@ func NewUserUsecase(userRepo domain.UserRepository, fileUsecase domain.FileUseca
 	return &userUsecase{userRepo, fileUsecase, otpUsecase}
 }
 
-func (u *userUsecase) GetByEmail(ctx context.Context, email string) (*domain.UserModel, error) {
-	data, err := u.userRepo.GetByEmail(ctx, email)
+func (u *userUsecase) GetByEmail(ctx context.Context, email string) (*domain.User, error) {
+	user, err := u.userRepo.GetByEmail(ctx, email)
 	if err != nil {
-		return nil, errs.New(errs.ErrInternal, "Internal server error", err)
+		return nil, err
 	}
 
-	if data == nil {
-		return nil, errs.New(errs.ErrNotFound, "User not found", nil)
+	if user == nil {
+		return nil, errs.NewError(errs.ErrNotFound, fmt.Errorf("user not found"))
 	}
 
-	return data, nil
-}
-func (u *userUsecase) GetByID(ctx context.Context, id int) (*domain.UserModel, error) {
-	data, err := u.userRepo.GetByID(ctx, id)
-	if err != nil {
-		return nil, errs.New(errs.ErrInternal, "Internal server error", err)
-	}
-
-	if data == nil {
-		return nil, errs.New(errs.ErrNotFound, "User not found", nil)
-	}
-
-	return data, nil
+	return user, nil
 }
 
-func (u *userUsecase) Create(ctx context.Context, user *domain.UserModel) error {
-	salt := pwd.Salt(9)
-	hashPassword, err := pwd.PasswordHash(user.Password, salt)
+func (u *userUsecase) GetByUsername(ctx context.Context, username string) (*domain.User, error) {
+	user, err := u.userRepo.GetByUsername(ctx, username)
 	if err != nil {
-		return errs.New(errs.ErrInternal, "Internal server error", err)
+		return nil, err
 	}
 
-	user.Password = hashPassword
-	user.Salt = salt
+	if user == nil {
+		return nil, errs.NewError(errs.ErrNotFound, fmt.Errorf("user not found"))
+	}
+
+	return user, nil
+}
+
+func (u *userUsecase) GetByID(ctx context.Context, id int64) (*domain.User, error) {
+	user, err := u.userRepo.GetByID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	if user == nil {
+		return nil, errs.NewError(errs.ErrNotFound, fmt.Errorf("user not found"))
+	}
+
+	return user, nil
+}
+
+func (u *userUsecase) Create(ctx context.Context, user *domain.User) error {
+	findEmain, err := u.GetByEmail(ctx, user.Email)
+	if findEmain != nil {
+		return errs.NewError(errs.ErrConflict, fmt.Errorf("email already exists"))
+	} else if err.Error() != "user not found" {
+		return err
+	}
+
+	findUsername, err := u.GetByUsername(ctx, user.Username)
+	if findUsername != nil {
+		return errs.NewError(errs.ErrConflict, fmt.Errorf("username already exists"))
+	} else if err.Error() != "user not found" {
+		return err
+	}
 
 	err = u.userRepo.Create(ctx, user)
 	if err != nil {
-		return errs.New(errs.ErrInternal, "Internal server error", err)
+		return err
 	}
 
 	return nil
+
 }
 
-func (u *userUsecase) Update(ctx context.Context, id int, data *domain.UserModel) error {
-	user, err := u.GetByID(ctx, id)
+func (u *userUsecase) Update(ctx context.Context, id int64, user *domain.User) error {
+	find, err := u.GetByID(ctx, id)
 	if err != nil {
 		return err
 	}
 
-	if data.Password != "" {
-		salt := pwd.Salt(9)
-		hashPassword, err := pwd.PasswordHash(user.Password, salt)
+	if user.Username != "" {
+		find.Username = user.Username
+	}
+
+	if user.Email != "" {
+		find.Email = user.Email
+	}
+
+	if user.Gender != "" {
+		find.Gender = user.Gender
+	}
+
+	if user.Profile != nil {
+		if strings.Compare(*find.Profile, *user.Profile) != 0 {
+			u.fileUsecase.RemoveFile(*find.Profile)
+		}
+
+		find.Profile = user.Profile
+	}
+
+	if !pwd.Compare(user.Password, find.Salt, find.Password) {
+		find.Salt = pwd.Salt(15)
+		hash, err := pwd.PasswordHash(user.Password, find.Salt)
 		if err != nil {
-			return errs.New(errs.ErrInternal, "Internal server error", err)
+			return err
 		}
 
-		user.Password = hashPassword
-		user.Salt = salt
+		find.Password = hash
 	}
 
-	if data.Username != "" && data.Username != user.Username {
-		user.Username = data.Username
-	}
-
-	if data.Email != "" && data.Email != user.Email {
-		user.Email = data.Email
-	}
-
-	if data.Gender != "" && data.Gender != user.Gender {
-		user.Gender = data.Gender
-	}
-
-	if !data.Date.Time().Equal(user.Date.Time()) {
-		user.Date = data.Date
-	}
-
-	if data.Profile != nil && data.Profile != user.Profile {
-		if user.Profile != nil {
-			u.fileUsecase.RemoveFile(*user.Profile)
-		}
-
-		user.Profile = data.Profile
-	}
-
-	err = u.userRepo.Update(ctx, user)
-	if err != nil {
-		return errs.New(errs.ErrInternal, "Internal server error", err)
-	}
-	return nil
+	return u.userRepo.Update(ctx, find)
 }
 
-func (u *userUsecase) UpdatePassword(ctx context.Context, id int, password string) error {
-	data, err := u.GetByID(ctx, id)
+func (u *userUsecase) ResetPassword(ctx context.Context, code string, password string) error {
+	otp, _, err := u.otpUsecase.GetOTP(ctx, code)
 	if err != nil {
 		return err
 	}
 
-	salt := pwd.Salt(9)
-	hashPassword, err := pwd.PasswordHash(password, salt)
-	if err != nil {
-		return errs.New(errs.ErrInternal, "Internal server error", err)
-	}
-
-	data.Password = hashPassword
-	data.Salt = salt
-
-	err = u.userRepo.Update(ctx, data)
-	if err != nil {
-		return errs.New(errs.ErrInternal, "Internal server error", err)
-	}
-	return nil
-}
-
-func (u *userUsecase) GetByUsername(ctx context.Context, username string) (*domain.UserModel, error) {
-	data, err := u.userRepo.GetByUsername(ctx, username)
-	if err != nil {
-		return nil, errs.New(errs.ErrInternal, "Internal server error", err)
-	}
-
-	if data == nil {
-		return nil, errs.New(errs.ErrNotFound, "User not found", nil)
-	}
-
-	return data, nil
-}
-
-func (u *userUsecase) CreateOTP(ctx context.Context, username string) (string, error) {
-	data, err := u.GetByUsername(ctx, username)
-	if err != nil {
-		return "", err
-	}
-
-	code, err := u.otpUsecase.Create(ctx, int(data.ID))
-	if err != nil {
-		return "", err
-	}
-
-	return code, nil
-}
-
-func (u *userUsecase) VerifyOTP(ctx context.Context, code string, otp string) error {
-	data, err := u.otpUsecase.GetByCodeWithExpire(ctx, code)
+	salt := pwd.Salt(15)
+	hash, err := pwd.PasswordHash(password, salt)
 	if err != nil {
 		return err
 	}
 
-	if data.OTP != otp {
-		return errs.New(errs.ErrNotFound, "OTP not match", nil)
-	}
-
-	return nil
-}
-
-func (u *userUsecase) UpdatePasswordWithCode(ctx context.Context, code string, password string) error {
-	data, err := u.otpUsecase.GetByCode(ctx, code)
+	err = u.userRepo.UpdatePassword(ctx, otp.ID, hash, salt)
 	if err != nil {
 		return err
 	}
 	u.otpUsecase.Delete(ctx, code)
 
-	return u.UpdatePassword(ctx, data.ID, password)
+	return nil
+}
+
+func (u *userUsecase) ForgetPassword(ctx context.Context, username string) (string, error) {
+	user, err := u.GetByUsername(ctx, username)
+	if err != nil {
+		return "", err
+	}
+
+	if user == nil {
+		return "", errs.NewError(errs.ErrNotFound, fmt.Errorf("user not found"))
+	}
+
+	code, err := u.otpUsecase.Create(ctx, user.ID, user.Email)
+	return code, nil
 }

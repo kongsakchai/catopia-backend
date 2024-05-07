@@ -12,7 +12,7 @@ func PasswordHash(password string, salt string) (string, error) {
 	str := fmt.Sprintf("%s:(-_-)7%s", password, salt)
 	bytes, err := bcrypt.GenerateFromPassword([]byte(str), 14)
 	if err != nil {
-		return "", errs.New(errs.ErrInternal, "Internal server error", err)
+		return "", errs.NewError(errs.ErrInternal, err)
 	}
 
 	return string(bytes), err

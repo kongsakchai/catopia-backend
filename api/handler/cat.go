@@ -8,8 +8,7 @@ import (
 	"github.com/kongsakchai/catopia-backend/api/payload"
 	"github.com/kongsakchai/catopia-backend/api/response"
 	"github.com/kongsakchai/catopia-backend/domain"
-	errs "github.com/kongsakchai/catopia-backend/domain/error"
-	"github.com/kongsakchai/catopia-backend/utils/data"
+	"github.com/kongsakchai/catopia-backend/utils/mapping"
 )
 
 type CatHandler struct {
@@ -21,123 +20,123 @@ func NewCatHandler(catUsecase domain.CatUsecase) *CatHandler {
 }
 
 func (h *CatHandler) GetByID(c *gin.Context) {
-	userID, err := strconv.Atoi(c.Param("user_id"))
+	userID, err := strconv.ParseInt(c.Param("user_id"), 10, 64)
 	if err != nil {
-		response.NewErrorResponse(c, errs.New(errs.ErrBadRequest, "Bad Request", err))
+		response.NewError(c, err)
 		return
 	}
 
-	id, err := strconv.Atoi(c.Param("id"))
+	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
-		response.NewErrorResponse(c, errs.New(errs.ErrBadRequest, "Bad Request", err))
+		response.NewError(c, err)
 		return
 	}
 
 	data, err := h.catUsecase.GetByID(c, id, userID)
 	if err != nil {
-		response.NewErrorResponse(c, err)
+		response.NewError(c, err)
 		return
 	}
 
-	response.NewResponse(c, http.StatusOK, "success", data)
+	response.New(c, http.StatusOK, "success", data)
 }
 
 func (h *CatHandler) GetAll(c *gin.Context) {
-	userID, err := strconv.Atoi(c.Param("user_id"))
+	userID, err := strconv.ParseInt(c.Param("user_id"), 10, 64)
 	if err != nil {
-		response.NewErrorResponse(c, errs.New(errs.ErrBadRequest, "Bad Request", err))
+		response.NewError(c, err)
 		return
 	}
 
 	data, err := h.catUsecase.GetByUserID(c, userID)
 	if err != nil {
-		response.NewErrorResponse(c, err)
+		response.NewError(c, err)
 		return
 	}
 
-	response.NewResponse(c, http.StatusOK, "success", data)
+	response.New(c, http.StatusOK, "success", data)
 }
 
 func (h *CatHandler) Create(c *gin.Context) {
 	var req payload.CreateCat
 	if err := c.ShouldBindJSON(&req); err != nil {
-		response.NewErrorResponse(c, errs.New(errs.ErrBadRequest, "Bad Request", err))
+		response.NewError(c, err)
 		return
 	}
 
-	userID, err := strconv.Atoi(c.Param("user_id"))
+	userID, err := strconv.ParseInt(c.Param("user_id"), 10, 64)
 	if err != nil {
-		response.NewErrorResponse(c, errs.New(errs.ErrBadRequest, "Bad Request", err))
+		response.NewError(c, err)
 		return
 	}
 
-	data, err := data.Mapping[domain.CatModel](&req)
+	data, err := mapping.Mapping[domain.Cat](&req)
 	if err != nil {
-		response.NewErrorResponse(c, err)
+		response.NewError(c, err)
 		return
 	}
 
-	err = h.catUsecase.Create(c, data, userID)
+	err = h.catUsecase.Create(c, userID, data)
 	if err != nil {
-		response.NewErrorResponse(c, err)
+		response.NewError(c, err)
 		return
 	}
 
-	response.NewResponse(c, http.StatusCreated, "success", nil)
+	response.New(c, http.StatusCreated, "success", nil)
 }
 
 func (h *CatHandler) Update(c *gin.Context) {
 	var req payload.UpdateCat
 	if err := c.ShouldBindJSON(&req); err != nil {
-		response.NewErrorResponse(c, errs.New(errs.ErrBadRequest, "Bad Request", err))
+		response.NewError(c, err)
 		return
 	}
 
-	userID, err := strconv.Atoi(c.Param("user_id"))
+	userID, err := strconv.ParseInt(c.Param("user_id"), 10, 64)
 	if err != nil {
-		response.NewErrorResponse(c, errs.New(errs.ErrBadRequest, "Bad Request", err))
+		response.NewError(c, err)
 		return
 	}
 
-	id, err := strconv.Atoi(c.Param("id"))
+	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
-		response.NewErrorResponse(c, errs.New(errs.ErrBadRequest, "Bad Request", err))
+		response.NewError(c, err)
 		return
 	}
 
-	data, err := data.Mapping[domain.CatModel](&req)
+	data, err := mapping.Mapping[domain.Cat](&req)
 	if err != nil {
-		response.NewErrorResponse(c, err)
+		response.NewError(c, err)
 		return
 	}
 
 	err = h.catUsecase.Update(c, id, userID, data)
 	if err != nil {
-		response.NewErrorResponse(c, err)
+		response.NewError(c, err)
 		return
 	}
 
-	response.NewResponse(c, http.StatusOK, "success", nil)
+	response.New(c, http.StatusOK, "success", nil)
 }
 
 func (h *CatHandler) Delete(c *gin.Context) {
-	userID, err := strconv.Atoi(c.Param("user_id"))
+	userID, err := strconv.ParseInt(c.Param("user_id"), 10, 64)
 	if err != nil {
-		response.NewErrorResponse(c, errs.New(errs.ErrBadRequest, "Bad Request", err))
+		response.NewError(c, err)
 		return
 	}
 
-	id, err := strconv.Atoi(c.Param("id"))
+	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
-		response.NewErrorResponse(c, errs.New(errs.ErrBadRequest, "Bad Request", err))
+		response.NewError(c, err)
 		return
 	}
 
 	err = h.catUsecase.Delete(c, id, userID)
 	if err != nil {
-		response.NewErrorResponse(c, err)
+		response.NewError(c, err)
 		return
 	}
 
-	response.NewResponse(c, http.StatusOK, "success", nil)
+	response.New(c, http.StatusOK, "success", nil)
 }

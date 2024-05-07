@@ -8,6 +8,7 @@ import (
 	"github.com/kongsakchai/catopia-backend/api/handler"
 	"github.com/kongsakchai/catopia-backend/api/middleware"
 	"github.com/kongsakchai/catopia-backend/config"
+	db "github.com/kongsakchai/catopia-backend/database"
 	"github.com/kongsakchai/catopia-backend/repository"
 	"github.com/kongsakchai/catopia-backend/usecase"
 )
@@ -48,25 +49,28 @@ func (api *API) Start() {
 }
 
 func (a *API) initRoute() {
+	db := db.GetDB()
 
-	sessionRepo := repository.NewSessionRepository()
-	userRepo := repository.NewUserRepository()
-	catRepo := repository.NewCatRepository()
-	treatmentRepo := repository.NewTreatmentRepository()
-	otpRepository := repository.NewOTPRepository()
+	sessionRepo := repository.NewSessionRepository(db)
+	userRepo := repository.NewUserRepository(db)
+	catRepo := repository.NewCatRepository(db)
+	treatmentRepo := repository.NewTreatmentRepository(db)
 
 	fileUsecase := usecase.NewFileUsecase()
-	otpUsecase := usecase.NewOTPUsecase(otpRepository)
+	otpUsecase := usecase.NewOTPUsecase()
+	modelUsecase := usecase.NewModelUsecae()
 	sessionUsecase := usecase.NewSessionUsecase(sessionRepo)
 	userUsecase := usecase.NewUserUsecase(userRepo, fileUsecase, otpUsecase)
 	authUsecase := usecase.NewAuthUsecase(userUsecase, sessionUsecase)
-	catUsecase := usecase.NewCatUsecase(catRepo, fileUsecase)
+	catUsecase := usecase.NewCatUsecase(catRepo, fileUsecase, modelUsecase)
 	treatmentUsecase := usecase.NewTreatmentUsecase(treatmentRepo, catUsecase)
 
 	authHandler := handler.NewAuthHandler(authUsecase)
 	userHandler := handler.NewUserHandler(userUsecase)
 	catHandler := handler.NewCatHandler(catUsecase)
 	treatmentHandler := handler.NewTreatmentHandler(treatmentUsecase)
+	otpHandler := handler.NewOTPHandler(otpUsecase)
+	recommendHandler := handler.NewRecommendHandler(catUsecase)
 
 	authMiddleware := middleware.AuthorizationMiddleware(sessionUsecase)
 
@@ -81,9 +85,9 @@ func (a *API) initRoute() {
 	user.GET("", authMiddleware, userHandler.Get)
 	user.PUT("", authMiddleware, userHandler.Update)
 
-	user.PUT("/password", userHandler.UpdatePassword)
-	user.POST("/otp", userHandler.GetOTP)
-	user.POST("/otp/verify", userHandler.VerifyOTP)
+	api.PUT("/reset-password", userHandler.ResetPassword)
+	api.POST("/forget-password", userHandler.ForgetPassword)
+	api.POST("/otp/verify", otpHandler.VerifyOTP)
 
 	cat := api.Group("/cat", authMiddleware)
 	cat.GET("/:id", catHandler.GetByID)
@@ -92,15 +96,18 @@ func (a *API) initRoute() {
 	cat.PUT("/:id", catHandler.Update)
 	cat.DELETE("/:id", catHandler.Delete)
 
-	api.GET("/treatment-type", treatmentHandler.GetType)
-
-	treatment := api.Group("/treatment", authMiddleware)
-	treatment.GET("/:cat_id/:id", treatmentHandler.GetByID)
-	treatment.GET("/:cat_id", treatmentHandler.GetByCatID)
-	treatment.POST("/:cat_id", treatmentHandler.Create)
-	treatment.PUT("/:cat_id/:id", treatmentHandler.Update)
-	treatment.DELETE("/:cat_id/:id", treatmentHandler.Delete)
+	treatment := api.Group("/treatment")
+	treatment.GET("/type", treatmentHandler.GetType)
+	treatment.GET("/:cat_id/:id", authMiddleware, treatmentHandler.GetByID)
+	treatment.GET("/:cat_id", authMiddleware, treatmentHandler.GetByCatID)
+	treatment.POST("/:cat_id", authMiddleware, treatmentHandler.Create)
+	treatment.PUT("/:cat_id/:id", authMiddleware, treatmentHandler.Update)
+	treatment.DELETE("/:cat_id/:id", authMiddleware, treatmentHandler.Delete)
 
 	file := api.Group("/file", authMiddleware)
 	file.POST("/upload", handler.NewFileHandler().Upload)
+
+	recommend := api.Group("/recommend")
+	recommend.GET("/cat/:id", authMiddleware, recommendHandler.GetByCatID)
+	recommend.GET("/cat/", authMiddleware, recommendHandler.GetRandom)
 }

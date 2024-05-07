@@ -4,6 +4,7 @@ import (
 	"github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
 	"github.com/kongsakchai/catopia-backend/config"
+	errs "github.com/kongsakchai/catopia-backend/domain/error"
 )
 
 var database *Database
@@ -12,21 +13,10 @@ type Database struct {
 	*sqlx.DB
 }
 
-type Tx = sqlx.Tx
-
 func newDB() *Database {
 	cfg := config.Get()
 
-	dbCfg := &mysql.Config{
-		User:      cfg.DBUser,
-		Passwd:    cfg.DBPassword,
-		Net:       "tcp",
-		Addr:      cfg.DBHost + ":" + cfg.DBPort,
-		DBName:    cfg.DBname,
-		ParseTime: true,
-	}
-
-	db, err := sqlx.Connect("mysql", dbCfg.FormatDSN())
+	db, err := sqlx.Connect("mysql", cfg.DBUrl+cfg.DBName+"?parseTime=true")
 	if err != nil {
 		panic(err)
 	}
@@ -40,4 +30,17 @@ func GetDB() *Database {
 	}
 
 	return database
+}
+
+func HandlerError(err error) error {
+	dbErr, ok := err.(*mysql.MySQLError)
+
+	if ok {
+		switch dbErr.Number {
+		case 1062:
+			return errs.NewErrorWithSkip(errs.ErrConflict, err, 2)
+		}
+	}
+
+	return err
 }

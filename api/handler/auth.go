@@ -8,7 +8,7 @@ import (
 	"github.com/kongsakchai/catopia-backend/api/response"
 	"github.com/kongsakchai/catopia-backend/domain"
 	errs "github.com/kongsakchai/catopia-backend/domain/error"
-	"github.com/kongsakchai/catopia-backend/utils/data"
+	"github.com/kongsakchai/catopia-backend/utils/mapping"
 )
 
 type AuthHandler struct {
@@ -22,54 +22,54 @@ func NewAuthHandler(authUsecase domain.AuthUsecase) *AuthHandler {
 func (h *AuthHandler) Register(c *gin.Context) {
 	var req payload.Regis
 	if err := c.ShouldBindJSON(&req); err != nil {
-		response.NewErrorResponse(c, errs.New(errs.ErrBadRequest, "Bad Request", err))
+		response.NewError(c, err)
 		return
 	}
 
-	data, err := data.Mapping[domain.UserModel](&req)
+	data, err := mapping.Mapping[domain.User](&req)
 	if err != nil {
-		response.NewErrorResponse(c, err)
+		response.NewError(c, err)
 		return
 	}
 
 	data.Password = req.Password
 	err = h.authUsecase.Register(c, data)
 	if err != nil {
-		response.NewErrorResponse(c, err)
+		response.NewError(c, err)
 		return
 	}
 
-	response.NewResponse(c, http.StatusCreated, "success", nil)
+	response.New(c, http.StatusCreated, "success", nil)
 }
 
 func (h *AuthHandler) Login(c *gin.Context) {
 	var req payload.Login
 	if err := c.ShouldBindJSON(&req); err != nil {
-		response.NewErrorResponse(c, errs.New(errs.ErrBadRequest, "Bad Request", err))
+		response.NewError(c, err)
 		return
 	}
 
 	token, err := h.authUsecase.Login(c, req.Username, req.Password)
 	if err != nil {
-		response.NewErrorResponse(c, err)
+		response.NewError(c, err)
 		return
 	}
 
-	response.NewResponse(c, http.StatusCreated, "success", &payload.LoginResponse{Token: token})
+	response.New(c, http.StatusCreated, "success", &payload.LoginResponse{Token: token})
 }
 
 func (h *AuthHandler) Logout(c *gin.Context) {
 	id := c.Param("session_id")
 	if id == "" {
-		response.NewErrorResponse(c, errs.New(errs.ErrBadRequest, "Bad Request", nil))
+		response.NewError(c, errs.NewError(errs.ErrBadRequest, nil))
 		return
 	}
 
 	err := h.authUsecase.Logout(c, id)
 	if err != nil {
-		response.NewErrorResponse(c, err)
+		response.NewError(c, err)
 		return
 	}
 
-	response.NewResponse(c, http.StatusOK, "success", nil)
+	response.New(c, http.StatusOK, "success", nil)
 }

@@ -2,20 +2,18 @@ package repository
 
 import (
 	"context"
-	"database/sql"
-	"fmt"
 
 	sq "github.com/Masterminds/squirrel"
 	db "github.com/kongsakchai/catopia-backend/database"
 	"github.com/kongsakchai/catopia-backend/domain"
+	errs "github.com/kongsakchai/catopia-backend/domain/error"
 )
 
 type sessionRepository struct {
 	db *db.Database
 }
 
-func NewSessionRepository() domain.SessionRepository {
-	db := db.GetDB()
+func NewSessionRepository(db *db.Database) domain.SessionRepository {
 	return &sessionRepository{db}
 }
 
@@ -26,12 +24,12 @@ func (r *sessionRepository) Create(ctx context.Context, session *domain.Session)
 
 	query, _, err := sqlBuild.ToSql()
 	if err != nil {
-		return fmt.Errorf("create session: error building query: %w", err)
+		return errs.NewError(errs.ErrSessionCreate, err)
 	}
 
 	_, err = r.db.NamedExecContext(ctx, query, session)
 	if err != nil {
-		return fmt.Errorf("create session: error executing query: %w", err)
+		return errs.NewError(errs.ErrSessionCreate, err)
 	}
 
 	return nil
@@ -46,14 +44,12 @@ func (r *sessionRepository) FindByID(ctx context.Context, id string) (*domain.Se
 
 	query, arg, err := sqlBuild.ToSql()
 	if err != nil {
-		return nil, fmt.Errorf("get session by id: error building query: %w", err)
+		return nil, errs.NewError(errs.ErrSessionGet, err)
 	}
 
 	err = r.db.GetContext(ctx, &session, query, arg...)
-	if err != nil && err == sql.ErrNoRows {
-		return nil, nil
-	} else if err != nil {
-		return nil, fmt.Errorf("get session by id: error executing query: %w", err)
+	if err != nil {
+		return nil, errs.NewError(errs.ErrSessionGet, err)
 	}
 
 	return &session, nil
@@ -65,12 +61,29 @@ func (r *sessionRepository) Delete(ctx context.Context, id string) error {
 
 	query, arg, err := sqlBuild.ToSql()
 	if err != nil {
-		return fmt.Errorf("delete session: error building query: %w", err)
+		return errs.NewError(errs.ErrSessionDelete, err)
 	}
 
 	_, err = r.db.ExecContext(ctx, query, arg...)
 	if err != nil {
-		return fmt.Errorf("delete session: error executing query: %w", err)
+		return errs.NewError(errs.ErrSessionDelete, err)
+	}
+
+	return nil
+}
+
+func (r *sessionRepository) ClearExpired(ctx context.Context) error {
+	sqlBuild := sq.Delete("sessions").
+		Where(" expired_at < NOW()")
+
+	query, _, err := sqlBuild.ToSql()
+	if err != nil {
+		return errs.NewError(errs.ErrSessionDelete, err)
+	}
+
+	_, err = r.db.ExecContext(ctx, query)
+	if err != nil {
+		return errs.NewError(errs.ErrSessionDelete, err)
 	}
 
 	return nil
