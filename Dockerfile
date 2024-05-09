@@ -13,4 +13,4 @@ COPY --from=0 /app/catopia .
 COPY --from=0 /app/migrate .
 COPY --from=0 /app/others ./others
 EXPOSE 8080
-CMD ["./migrate","./catopia"]
+CMD ["./catopia"]

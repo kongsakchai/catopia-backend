@@ -4,6 +4,9 @@ start:
 stop:
 	docker compose down
 
+edit:
+	nano docker-compose.yml
+
 run:
 	docker run --name backend  --env-file ./.env --network host -i -d backend
 
