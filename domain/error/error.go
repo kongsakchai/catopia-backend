@@ -16,7 +16,7 @@ func (e *Error) Error() string {
 	return fmt.Sprintf("code: %d, message: %s", e.Code, e.Message)
 }
 
-func NewError(code int, err error) *Error {
+func NewError(code int, err error) error {
 	var message string
 
 	if err != nil {
@@ -41,7 +41,7 @@ func NewError(code int, err error) *Error {
 	}
 }
 
-func NewErrorWithSkip(code int, err error, skip int) *Error {
+func NewErrorWithSkip(code int, err error, skip int) error {
 	var message string
 
 	if err != nil {

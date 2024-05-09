@@ -6,7 +6,7 @@ COPY . .
 RUN go build -o catopia main.go
 RUN go build -o migrate cmd/migration.go
 
-FROM debian:latest
+FROM debian:stable-slim
 ENV TZ="Asia/Bangkok"
 WORKDIR /root/
 COPY --from=0 /app/catopia .

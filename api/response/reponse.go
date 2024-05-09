@@ -11,7 +11,7 @@ import (
 type Response struct {
 	Success bool        `json:"success"`
 	Data    interface{} `json:"data,omitempty"`
-	Error   *errs.Error `json:"error,omitempty"`
+	Error   error       `json:"error,omitempty"`
 }
 
 func NewError(c *gin.Context, err error) {

@@ -61,16 +61,23 @@ func (u *userUsecase) GetByID(ctx context.Context, id int64) (*domain.User, erro
 
 func (u *userUsecase) Create(ctx context.Context, user *domain.User) error {
 	findEmain, err := u.GetByEmail(ctx, user.Email)
+	fmt.Println(findEmain, err)
 	if findEmain != nil {
 		return errs.NewError(errs.ErrConflict, fmt.Errorf("email already exists"))
-	} else if err.Error() != "user not found" {
+	} else if errs.GetCode(err) != errs.ErrNotFound {
 		return err
 	}
 
 	findUsername, err := u.GetByUsername(ctx, user.Username)
 	if findUsername != nil {
 		return errs.NewError(errs.ErrConflict, fmt.Errorf("username already exists"))
-	} else if err.Error() != "user not found" {
+	} else if errs.GetCode(err) != errs.ErrNotFound {
+		return err
+	}
+
+	user.Salt = pwd.Salt(15)
+	user.Password, err = pwd.PasswordHash(user.Password, user.Salt)
+	if err != nil {
 		return err
 	}
 
