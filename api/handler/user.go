@@ -94,3 +94,13 @@ func (h *UserHandler) ResetPassword(c *gin.Context) {
 
 	response.New(c, http.StatusCreated, "success", nil)
 }
+
+func (h *UserHandler) UserAnswer(c *gin.Context) {
+	var req payload.UserAnswer
+	if err := c.ShouldBindJSON(&req); err != nil {
+		response.NewError(c, err)
+		return
+	}
+
+	response.New(c, http.StatusCreated, "success", nil)
+}

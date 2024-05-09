@@ -11,6 +11,6 @@ ENV TZ="Asia/Bangkok"
 WORKDIR /root/
 COPY --from=0 /app/catopia .
 COPY --from=0 /app/migrate .
-COPY --from=0 /app/others ./others
+COPY --from=0 /app/start.sh .
 EXPOSE 8080
-CMD ["./catopia"]
+CMD ["sh ./start.sh"]

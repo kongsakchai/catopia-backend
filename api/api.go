@@ -84,6 +84,7 @@ func (a *API) initRoute() {
 	user := api.Group("/user")
 	user.GET("", authMiddleware, userHandler.Get)
 	user.PUT("", authMiddleware, userHandler.Update)
+	user.POST("/answer", authMiddleware, userHandler.UserAnswer)
 
 	api.PUT("/reset-password", userHandler.ResetPassword)
 	api.POST("/forget-password", userHandler.ForgetPassword)

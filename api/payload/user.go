@@ -24,3 +24,7 @@ type VerifyOTP struct {
 	Code string `json:"code" binding:"required"`
 	OTP  string `json:"otp" binding:"required"`
 }
+
+type UserAnswer struct {
+	Answer []string `json:"answer" binding:"required"`
+}

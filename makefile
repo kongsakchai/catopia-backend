@@ -8,7 +8,7 @@ edit:
 	nano docker-compose.yml
 
 run:
-	docker run --name backend  --env-file ./.env --network host -i -d backend
+	docker run --name backend -v /others:/root/others  --env-file ./.env --network host -i -d backend
 
 build:
 	docker build -t backend .

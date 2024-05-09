@@ -1,18 +1,6 @@
 version: "3.1"
 
 services:
-  nginx:
-    container_name: nginx
-    image: nginx
-    ports:
-      - 80:80
-    volumes:
-      - ./others/nginx:/etc/nginx/templates
-    networks:
-      - app
-    depends_on:
-      - backend
-
   db:
     container_name: db
     image: mysql:8
@@ -51,6 +39,7 @@ services:
       - 8080:8080
     volumes:
       - "./.backup/uploads:/root/uploads"
+      - "./others:/root/others"
     networks:
       - app
     depends_on:
