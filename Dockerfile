@@ -13,4 +13,4 @@ COPY --from=0 /app/catopia .
 COPY --from=0 /app/migrate .
 COPY --from=0 /app/start.sh .
 EXPOSE 8080
-CMD ["sh ./start.sh"]
+CMD ["sh","start.sh"]
