@@ -533,7 +533,7 @@ paths:
       responses: {}
       tags:
       - Forgot Password
-  /api/treatment/:user_id/{cat_id}:
+  /api/treatment/{cat_id}:
     get:
       consumes:
       - application/json
@@ -558,7 +558,6 @@ paths:
       - ApiKeyAuth: []
       tags:
       - treatment
-  /api/treatment/{cat_id}:
     post:
       consumes:
       - application/json

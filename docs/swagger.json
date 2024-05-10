@@ -382,7 +382,35 @@
                 "responses": {}
             }
         },
-        "/api/treatment/:user_id/{cat_id}": {
+        "/api/treatment/type": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get treatment type",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "treatment"
+                ],
+                "operationId": "TreatmentGetTypeHandler",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/domain.TreatmentType"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/treatment/{cat_id}": {
             "get": {
                 "security": [
                     {
@@ -420,37 +448,7 @@
                         }
                     }
                 }
-            }
-        },
-        "/api/treatment/type": {
-            "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Get treatment type",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "treatment"
-                ],
-                "operationId": "TreatmentGetTypeHandler",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/domain.TreatmentType"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/treatment/{cat_id}": {
+            },
             "post": {
                 "security": [
                     {
