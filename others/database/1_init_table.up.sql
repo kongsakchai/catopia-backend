@@ -12,11 +12,12 @@ CREATE TABLE `users` (
     `gender` varchar(8) NOT NULL,
     `profile` varchar(64) DEFAULT NULL,
     `date` date NOT NULL,
+    `group_id` int DEFAULT NULL,
     `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`)
 );
 
-CREATE TABLE `session` (
+CREATE TABLE `sessions` (
     `id` varchar(64) NOT NULL,
     `user_id` int NOT NULL,
     `token` varchar(256) NOT NULL,

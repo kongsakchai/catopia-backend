@@ -1,0 +1,760 @@
+definitions:
+  domain.Cat:
+    properties:
+      aggression:
+        type: integer
+      breeding:
+        type: string
+      createAt:
+        type: string
+      date:
+        type: string
+      extraversion:
+        type: integer
+      gender:
+        type: string
+      group_id:
+        type: integer
+      id:
+        type: integer
+      last_update:
+        type: string
+      name:
+        type: string
+      profile:
+        type: string
+      shyness:
+        type: integer
+      userId:
+        type: integer
+      weight:
+        type: number
+    type: object
+  domain.Treatment:
+    properties:
+      catID:
+        type: integer
+      createdAt:
+        type: string
+      date:
+        type: string
+      detail:
+        type: string
+      id:
+        type: integer
+      location:
+        type: string
+      treatmentTypeID:
+        type: integer
+      vet:
+        type: string
+    type: object
+  domain.TreatmentType:
+    properties:
+      id:
+        type: integer
+      treatment_type:
+        type: string
+    type: object
+  payload.CreateCat:
+    properties:
+      aggression:
+        example: 5
+        type: integer
+      breeding:
+        example: siamese
+        type: string
+      date:
+        example: "2021-01-20"
+        format: date
+        type: string
+      extraversion:
+        example: 5
+        type: integer
+      gender:
+        enum:
+        - male
+        - female
+        example: male
+        type: string
+      name:
+        example: mori
+        type: string
+      profile:
+        example: url of image
+        type: string
+      shyness:
+        example: 5
+        type: integer
+      weight:
+        example: 3.5
+        format: float
+        type: number
+    required:
+    - breeding
+    - date
+    - gender
+    - name
+    - weight
+    type: object
+  payload.CreateTreatment:
+    properties:
+      date:
+        example: "2021-01-20"
+        format: date
+        type: string
+      detail:
+        example: vaccination
+        type: string
+      location:
+        example: clinic
+        type: string
+      treatmentTypeID:
+        example: 1
+        type: integer
+      vet:
+        example: Dr. John Doe
+        type: string
+    required:
+    - date
+    - treatmentTypeID
+    type: object
+  payload.GetOTP:
+    properties:
+      username:
+        example: kongsakchai
+        type: string
+    required:
+    - username
+    type: object
+  payload.Login:
+    properties:
+      password:
+        example: password123
+        type: string
+      username:
+        example: kongsakchai
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  payload.LoginResponse:
+    properties:
+      token:
+        type: string
+    type: object
+  payload.Regis:
+    properties:
+      date:
+        example: "2021-01-20"
+        format: date
+        type: string
+      email:
+        example: email@email.com
+        type: string
+      gender:
+        enum:
+        - male
+        - female
+        example: male
+        type: string
+      password:
+        example: password123
+        type: string
+      username:
+        example: kongsakchai
+        type: string
+    required:
+    - date
+    - email
+    - gender
+    - password
+    - username
+    type: object
+  payload.UpdateCat:
+    properties:
+      aggression:
+        example: 5
+        type: integer
+      breeding:
+        example: siamese
+        type: string
+      date:
+        example: "2021-01-20"
+        format: date
+        type: string
+      extraversion:
+        example: 5
+        type: integer
+      gender:
+        enum:
+        - male
+        - female
+        example: male
+        type: string
+      name:
+        example: mori
+        type: string
+      profile:
+        example: url of image
+        type: string
+      shyness:
+        example: 5
+        type: integer
+      weight:
+        example: 3.5
+        format: float
+        type: number
+    type: object
+  payload.UpdatePassword:
+    properties:
+      code:
+        example: "123456"
+        type: string
+      password:
+        example: password123
+        type: string
+    required:
+    - code
+    - password
+    type: object
+  payload.UpdateTreatment:
+    properties:
+      date:
+        example: "2021-01-20"
+        format: date
+        type: string
+      detail:
+        example: vaccination
+        type: string
+      location:
+        example: clinic
+        type: string
+      treatmentTypeID:
+        example: 1
+        type: integer
+      vet:
+        example: Dr. John Doe
+        type: string
+    type: object
+  payload.UpdateUser:
+    properties:
+      date:
+        example: "2021-01-20"
+        format: date
+        type: string
+      email:
+        example: mail@mail.com
+        type: string
+      gender:
+        enum:
+        - male
+        - female
+        example: male
+        type: string
+      password:
+        example: password123
+        type: string
+      profile:
+        example: url of image
+        type: string
+      username:
+        example: kongsakchai
+        type: string
+    type: object
+  payload.UserAnswer:
+    properties:
+      answer:
+        example:
+        - "1"
+        - "2"
+        - "3"
+        - "4"
+        - "5"
+        items:
+          type: string
+        type: array
+    required:
+    - answer
+    type: object
+  payload.VerifyOTP:
+    properties:
+      code:
+        example: "123456"
+        type: string
+      otp:
+        example: "123456"
+        type: string
+    required:
+    - code
+    - otp
+    type: object
+info:
+  contact:
+    name: CPE34 - Catopia
+  description: This is a Catopia API of CPE Senior Project.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://somewhere.com/
+  title: Catopia API
+  version: "1.0"
+paths:
+  /api/auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Login and get token
+      operationId: LoginHandler
+      parameters:
+      - description: User data
+        in: body
+        name: User
+        required: true
+        schema:
+          $ref: '#/definitions/payload.Login'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/payload.LoginResponse'
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - auth
+  /api/auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Register new user
+      operationId: RegisterHandler
+      parameters:
+      - description: User data
+        in: body
+        name: User
+        required: true
+        schema:
+          $ref: '#/definitions/payload.Regis'
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - auth
+  /api/cat:
+    get:
+      consumes:
+      - application/json
+      description: Get all cat
+      operationId: GetAllCatHandler
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/domain.Cat'
+            type: array
+      security:
+      - ApiKeyAuth: []
+      summary: All Cat
+      tags:
+      - cat
+  /api/cat/:
+    post:
+      consumes:
+      - application/json
+      description: Create new cat
+      operationId: CreateCatHandler
+      parameters:
+      - description: cat
+        in: body
+        name: cat
+        required: true
+        schema:
+          $ref: '#/definitions/payload.CreateCat'
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - cat
+  /api/cat/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Delete cat by id
+      operationId: DeleteCatHandler
+      parameters:
+      - description: id of cat
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - cat
+    put:
+      consumes:
+      - application/json
+      description: Update cat by ID
+      operationId: UpdateCatHandler
+      parameters:
+      - description: cat
+        in: body
+        name: cat
+        required: true
+        schema:
+          $ref: '#/definitions/payload.UpdateCat'
+      - description: id of cat
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - cat
+  /api/file/upload:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Upload file
+      operationId: FileUploadHandler
+      parameters:
+      - description: file to upload
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - file
+  /api/forget-password:
+    post:
+      consumes:
+      - application/json
+      description: Forget password
+      operationId: UserForgetPasswordHandler
+      parameters:
+      - description: username
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/payload.GetOTP'
+      produces:
+      - application/json
+      responses: {}
+      tags:
+      - Forgot Password
+  /api/otp/verify:
+    post:
+      consumes:
+      - application/json
+      description: Verify OTP
+      operationId: VerifyOTPHandler
+      parameters:
+      - description: code
+        in: body
+        name: code
+        required: true
+        schema:
+          $ref: '#/definitions/payload.VerifyOTP'
+      produces:
+      - application/json
+      responses: {}
+      tags:
+      - Forgot Password
+  /api/recommend/cat:
+    get:
+      consumes:
+      - application/json
+      description: Get cat by user data
+      operationId: RecommendGetByUserHandler
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - recommend
+  /api/recommend/cat/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get cat by cat ID
+      operationId: RecommendGetByCatIDHandler
+      parameters:
+      - description: id of cat
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - recommend
+  /api/reset-password:
+    put:
+      consumes:
+      - application/json
+      description: Reset password
+      operationId: UserResetPasswordHandler
+      parameters:
+      - description: code and password
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/payload.UpdatePassword'
+      produces:
+      - application/json
+      responses: {}
+      tags:
+      - Forgot Password
+  /api/treatment/:user_id/{cat_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get treatment by cat ID
+      operationId: TreatmentGetByCatIDHandler
+      parameters:
+      - description: cat id
+        in: path
+        name: cat_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/domain.Treatment'
+            type: array
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - treatment
+  /api/treatment/{cat_id}:
+    post:
+      consumes:
+      - application/json
+      description: Create new treatment
+      operationId: TreatmentCreateHandler
+      parameters:
+      - description: cat id
+        in: path
+        name: cat_id
+        required: true
+        type: integer
+      - description: create treatment
+        in: body
+        name: createTreatment
+        required: true
+        schema:
+          $ref: '#/definitions/payload.CreateTreatment'
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - treatment
+  /api/treatment/{cat_id}/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete treatment by ID
+      operationId: TreatmentDeleteHandler
+      parameters:
+      - description: cat id
+        in: path
+        name: cat_id
+        required: true
+        type: integer
+      - description: id of treatment
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - treatment
+    get:
+      consumes:
+      - application/json
+      description: Get treatment by ID
+      operationId: TreatmentGetByIDHandler
+      parameters:
+      - description: cat id
+        in: path
+        name: cat_id
+        required: true
+        type: integer
+      - description: id of treatment
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Treatment'
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - treatment
+    put:
+      consumes:
+      - application/json
+      description: Update treatment by ID
+      operationId: TreatmentUpdateHandler
+      parameters:
+      - description: cat id
+        in: path
+        name: cat_id
+        required: true
+        type: integer
+      - description: id of treatment
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: update treatment
+        in: body
+        name: updateTreatment
+        required: true
+        schema:
+          $ref: '#/definitions/payload.UpdateTreatment'
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - treatment
+  /api/treatment/type:
+    get:
+      consumes:
+      - application/json
+      description: Get treatment type
+      operationId: TreatmentGetTypeHandler
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.TreatmentType'
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - treatment
+  /api/user:
+    get:
+      consumes:
+      - application/json
+      description: Get user detail
+      operationId: UserGetHandler
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - user
+    put:
+      consumes:
+      - application/json
+      description: Update user detail
+      operationId: UserUpdateHandler
+      parameters:
+      - description: user id
+        in: path
+        name: user_id
+        required: true
+        type: integer
+      - description: user data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/payload.UpdateUser'
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - user
+  /api/user/answer:
+    post:
+      consumes:
+      - application/json
+      description: User answer
+      operationId: UserAnswerHandler
+      parameters:
+      - description: user answer
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/payload.UserAnswer'
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - user
+  /healthcheck:
+    get:
+      description: Health checking for the service
+      operationId: HealthCheckHandler
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Health Check
+schemes:
+- https
+- http
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

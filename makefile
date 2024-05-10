@@ -4,10 +4,10 @@ start:
 stop:
 	docker compose down
 
-edit:
+ed:
 	nano docker-compose.yml
 
-build:
+build-image:
 	docker build -t backend .
 
 rm:
@@ -18,3 +18,15 @@ rmi:
 
 exec:
 	docker exec -it backend bash
+
+build:
+	go build -o main main.go
+
+dev:
+	go run main.go
+
+migrate:
+	go run ./cmd/migrate.go
+
+swagger:
+	swag init

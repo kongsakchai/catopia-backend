@@ -22,11 +22,15 @@ func NewUserUsecase(userRepo domain.UserRepository, fileUsecase domain.FileUseca
 
 func (u *userUsecase) GetByEmail(ctx context.Context, email string) (*domain.User, error) {
 	user, err := u.userRepo.GetByEmail(ctx, email)
+	fmt.Println("user", user, "err", err, err == nil)
+
 	if err != nil {
+		fmt.Println("err not null", err)
 		return nil, err
 	}
 
 	if user == nil {
+		fmt.Println("user not found")
 		return nil, errs.NewError(errs.ErrNotFound, fmt.Errorf("user not found"))
 	}
 
@@ -61,7 +65,6 @@ func (u *userUsecase) GetByID(ctx context.Context, id int64) (*domain.User, erro
 
 func (u *userUsecase) Create(ctx context.Context, user *domain.User) error {
 	findEmain, err := u.GetByEmail(ctx, user.Email)
-	fmt.Println(findEmain, err)
 	if findEmain != nil {
 		return errs.NewError(errs.ErrConflict, fmt.Errorf("email already exists"))
 	} else if errs.GetCode(err) != errs.ErrNotFound {

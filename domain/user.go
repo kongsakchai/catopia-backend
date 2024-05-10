@@ -14,6 +14,7 @@ type User struct {
 	Salt      string         `json:"-" db:"salt"`
 	Gender    string         `json:"gender" db:"gender"`
 	Profile   *string        `json:"profile" db:"profile"`
+	GroupID   *int64         `json:"groupID" db:"group_id"`
 	Date      *date.JSONDate `json:"date" db:"date"`
 	CreatedAt *date.JSONDate `json:"createdAt" db:"created_at"`
 }

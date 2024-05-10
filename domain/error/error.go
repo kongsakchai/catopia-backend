@@ -21,11 +21,14 @@ func NewError(code int, err error) error {
 
 	if err != nil {
 		if err == sql.ErrNoRows {
+			fmt.Println("No", sql.ErrNoRows)
+
 			return nil
 		}
 
 		upwrapErr, ok := err.(*Error)
 		if ok {
+			fmt.Println(ok, upwrapErr)
 			return upwrapErr
 		}
 
@@ -33,7 +36,11 @@ func NewError(code int, err error) error {
 
 		_, fn, line, _ := runtime.Caller(1)
 		log.Printf("Error at %s:%d: %s \n", fn, line, message)
+	} else {
+		message = "unknown error"
 	}
+
+	fmt.Println("message", message, "code", code)
 
 	return &Error{
 		Code:    code,
@@ -71,6 +78,7 @@ func GetCode(err error) int {
 	if !ok {
 		return 0
 	}
+	fmt.Println(*e)
 
 	return e.Code
 }

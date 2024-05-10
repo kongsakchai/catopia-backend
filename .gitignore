@@ -24,4 +24,4 @@ go.work
 make.json
 temp/
 
-.data
+.backup/

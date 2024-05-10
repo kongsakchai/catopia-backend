@@ -19,6 +19,14 @@ func NewOTPHandler(otpUsecase domain.OTPUsecase) *OTPHandler {
 	return &OTPHandler{otpUsecase}
 }
 
+// VerifyOTP godoc
+// @description Verify OTP
+// @tags Forgot Password
+// @id VerifyOTPHandler
+// @accept json
+// @produce json
+// @param code body payload.VerifyOTP true "code"
+// @Router /api/otp/verify [post]
 func (h *OTPHandler) VerifyOTP(c *gin.Context) {
 	var req payload.VerifyOTP
 	if err := c.ShouldBindJSON(&req); err != nil {

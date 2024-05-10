@@ -15,6 +15,15 @@ func NewFileHandler() *FileHandler {
 	return &FileHandler{}
 }
 
+// Upload godoc
+// @description Upload file
+// @tags file
+// @security ApiKeyAuth
+// @id FileUploadHandler
+// @accept mpfd
+// @produce json
+// @param file formData file true "file to upload"
+// @Router /api/file/upload [post]
 func (h *FileHandler) Upload(c *gin.Context) {
 	file, err := c.FormFile("file")
 	if err != nil {

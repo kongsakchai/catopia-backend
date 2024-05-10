@@ -11,6 +11,9 @@ import (
 	db "github.com/kongsakchai/catopia-backend/database"
 	"github.com/kongsakchai/catopia-backend/repository"
 	"github.com/kongsakchai/catopia-backend/usecase"
+
+	swaggerfiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 type API struct {
@@ -42,6 +45,7 @@ func (api *API) Start() {
 	// app.Use(middleware.CORSMiddleware())
 
 	app.Static("/images", "./uploads")
+	app.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 
 	api.initRoute()
 
@@ -75,6 +79,7 @@ func (a *API) initRoute() {
 	authMiddleware := middleware.AuthorizationMiddleware(sessionUsecase)
 
 	api := a.app.Group("/api")
+	api.GET("/healthcheck", authHandler.HealthCheck)
 
 	auth := api.Group("/auth")
 	auth.POST("/register", authHandler.Register)

@@ -9,15 +9,11 @@ services:
       TZ: Asia/Bangkok
     volumes:
       - "./.backup/database:/var/lib/mysql"
+      - "./.backup/log/mysql:/var/log/mysql/"
     networks:
       - app
     env_file:
       - .env
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "--silent"]
-      interval: 5s
-      timeout: 3s
-      retries: 2
 
   adminer:
     container_name: adminer
@@ -41,8 +37,7 @@ services:
     networks:
       - app
     depends_on:
-      db:
-        condition: service_healthy
+      - db
     env_file:
       - .env
 
