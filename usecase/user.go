@@ -111,7 +111,7 @@ func (u *userUsecase) Update(ctx context.Context, id int64, user *domain.User) e
 		find.Gender = user.Gender
 	}
 
-	if user.Profile != nil {
+	if user.Profile != nil && find.Profile != nil {
 		if strings.Compare(*find.Profile, *user.Profile) != 0 {
 			u.fileUsecase.RemoveFile(*find.Profile)
 		}

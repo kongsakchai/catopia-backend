@@ -82,7 +82,7 @@ func (t *TreatmentHandler) GetByID(c *gin.Context) {
 // @produce json
 // @param cat_id path int true "cat id"
 // @response 200 {array} domain.Treatment
-// @Router /api/treatment/:user_id/{cat_id} [get]
+// @Router /api/treatment/{cat_id} [get]
 func (t *TreatmentHandler) GetByCatID(c *gin.Context) {
 	userID, err := strconv.ParseInt(c.Param("user_id"), 10, 64)
 	if err != nil {
