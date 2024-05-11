@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/kongsakchai/catopia-backend/domain"
 	errs "github.com/kongsakchai/catopia-backend/domain/error"
@@ -120,7 +121,7 @@ func (u *userUsecase) Update(ctx context.Context, id int64, user *domain.User) e
 		find.Profile = user.Profile
 	}
 
-	if !pwd.Compare(user.Password, find.Salt, find.Password) {
+	if user.Password != "" && !pwd.Compare(user.Password, find.Salt, find.Password) {
 		find.Salt = pwd.Salt(15)
 		hash, err := pwd.PasswordHash(user.Password, find.Salt)
 		if err != nil {
@@ -184,6 +185,27 @@ func (u *userUsecase) UpdateGroup(ctx context.Context, id int64, answer []float6
 	user, err := u.GetByID(ctx, id)
 	if err != nil {
 		return err
+	}
+
+	ages := time.Now().Year() - user.Date.Time().Year()
+	if ages <= 15 {
+		answer = append([]float64{0}, answer...)
+	} else if ages >= 16 && ages <= 20 {
+		answer = append([]float64{1}, answer...)
+	} else if ages >= 21 && ages <= 25 {
+		answer = append([]float64{2}, answer...)
+	} else if ages >= 26 && ages <= 30 {
+		answer = append([]float64{3}, answer...)
+	} else if ages >= 31 && ages <= 40 {
+		answer = append([]float64{4}, answer...)
+	} else {
+		answer = append([]float64{5}, answer...)
+	}
+
+	if user.Gender == "male" {
+		answer = append([]float64{0}, answer...)
+	} else {
+		answer = append([]float64{1}, answer...)
 	}
 
 	groupID, err := u.modelUsecase.UserGroup(answer)

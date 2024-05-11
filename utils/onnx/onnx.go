@@ -87,7 +87,7 @@ func newUserOnnx() *Onnx[int64] {
 		InputName:   "X",
 		OutputName:  "label",
 		InputShape:  ort.NewShape(1, 10),
-		OutputShape: ort.NewShape(1, 2),
+		OutputShape: ort.NewShape(1),
 	}
 }
 
