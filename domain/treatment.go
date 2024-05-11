@@ -14,6 +14,7 @@ type TreatmentType struct {
 type Treatment struct {
 	ID              int64          `json:"id" db:"id"`
 	CatID           int64          `json:"catID" db:"cat_id"`
+	Name            string         `json:"name" db:"name"`
 	TreatmentTypeID int64          `json:"treatmentTypeID" db:"treatment_type_id"`
 	Date            *date.JSONDate `json:"date" db:"date"`
 	Location        string         `json:"location" db:"location"`

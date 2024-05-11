@@ -42,6 +42,7 @@ func (h *OTPHandler) VerifyOTP(c *gin.Context) {
 
 	if !notExpire {
 		response.NewError(c, errs.NewError(errs.ErrNotFound, fmt.Errorf("otp expired")))
+		h.otpUsecase.Delete(c, req.Code)
 		return
 	}
 
