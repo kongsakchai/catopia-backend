@@ -14,6 +14,10 @@ services:
       - app
     env_file:
       - .env
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      timeout: 30s
+      retries: 5
 
   adminer:
     container_name: adminer
@@ -24,7 +28,7 @@ services:
       ADMINER_DESIGN: 'dracula'
     networks:
       - app
-  
+
   backend:
     container_name: backend
     image: backend
@@ -38,12 +42,11 @@ services:
       - app
     depends_on:
       db:
-        condition: service_completed_successfully
-      
+        condition: service_healthy
+
     env_file:
       - .env
 
 networks:
   app:
     driver: bridge
-
