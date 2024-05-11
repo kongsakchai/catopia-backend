@@ -7,7 +7,7 @@ stop:
 ed:
 	nano docker-compose.yml
 
-build-image:
+buildi:
 	docker build -t backend .
 
 rm:

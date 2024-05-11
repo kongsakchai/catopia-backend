@@ -26,12 +26,13 @@ type Cat struct {
 type CatRepository interface {
 	GetByID(ctx context.Context, id int64, userID int64) (*Cat, error)
 	GetByUserID(ctx context.Context, userID int64) ([]Cat, error)
+	GetByUserIDs(ctx context.Context, userID []int64) ([]Cat, error)
 	Create(ctx context.Context, cat *Cat) error
 	Update(ctx context.Context, cat *Cat) error
 	Delete(ctx context.Context, id int64) error
 	UpdateGroup(ctx context.Context, id int64, group int64) error
-	GetCluster(ctx context.Context, group int64) ([]string, error)
-	GetRandom(ctx context.Context) ([]string, error)
+	GetBreedingByGroup(ctx context.Context, group []int64, random bool) ([]string, error)
+	GetBreedingByRandom(ctx context.Context) ([]string, error)
 }
 
 type CatUsecase interface {
@@ -40,6 +41,7 @@ type CatUsecase interface {
 	Create(ctx context.Context, userID int64, cat *Cat) error
 	Update(ctx context.Context, id int64, userID int64, cat *Cat) error
 	Delete(ctx context.Context, id int64, userID int64) error
-	GetCluster(ctx context.Context, id int64, userID int64) ([]string, error)
-	GetRandom(ctx context.Context) ([]string, error)
+	GetBreedingByCat(ctx context.Context, id int64, userID int64) ([]string, error)
+	GetBreedingByUser(ctx context.Context, userID []int64) ([]string, error)
+	GetBreedingByRandom(ctx context.Context) ([]string, error)
 }

@@ -11,13 +11,14 @@ import (
 )
 
 type userUsecase struct {
-	userRepo    domain.UserRepository
-	fileUsecase domain.FileUsecase
-	otpUsecase  domain.OTPUsecase
+	userRepo     domain.UserRepository
+	fileUsecase  domain.FileUsecase
+	otpUsecase   domain.OTPUsecase
+	modelUsecase domain.ModelUsecae
 }
 
-func NewUserUsecase(userRepo domain.UserRepository, fileUsecase domain.FileUsecase, otpUsecase domain.OTPUsecase) domain.UserUsecase {
-	return &userUsecase{userRepo, fileUsecase, otpUsecase}
+func NewUserUsecase(userRepo domain.UserRepository, fileUsecase domain.FileUsecase, otpUsecase domain.OTPUsecase, modelUsecase domain.ModelUsecae) domain.UserUsecase {
+	return &userUsecase{userRepo, fileUsecase, otpUsecase, modelUsecase}
 }
 
 func (u *userUsecase) GetByEmail(ctx context.Context, email string) (*domain.User, error) {
@@ -164,4 +165,31 @@ func (u *userUsecase) ForgetPassword(ctx context.Context, username string) (stri
 	}
 
 	return u.otpUsecase.Create(ctx, user.ID, user.Email)
+}
+
+func (u *userUsecase) GetUserIDsInSameGroup(ctx context.Context, id int64) ([]int64, error) {
+	user, err := u.GetByID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	if user.GroupID == nil {
+		return nil, errs.NewError(errs.ErrNotFound, fmt.Errorf("user not in group"))
+	}
+
+	return u.userRepo.GetUserIDsByGroup(ctx, *user.GroupID)
+}
+
+func (u *userUsecase) UpdateGroup(ctx context.Context, id int64, answer []float64) error {
+	user, err := u.GetByID(ctx, id)
+	if err != nil {
+		return err
+	}
+
+	groupID, err := u.modelUsecase.UserGroup(answer)
+	if err != nil {
+		return err
+	}
+
+	return u.userRepo.UpdateGroup(ctx, user.ID, groupID)
 }

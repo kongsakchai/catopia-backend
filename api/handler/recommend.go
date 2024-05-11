@@ -10,11 +10,11 @@ import (
 )
 
 type RecommendHandler struct {
-	catUsecase domain.CatUsecase
+	recommendUsecase domain.RecommendUsecase
 }
 
-func NewRecommendHandler(catUsecase domain.CatUsecase) *RecommendHandler {
-	return &RecommendHandler{catUsecase}
+func NewRecommendHandler(recommendUsecase domain.RecommendUsecase) *RecommendHandler {
+	return &RecommendHandler{recommendUsecase}
 }
 
 // Get By Cat ID godoc
@@ -39,7 +39,7 @@ func (h *RecommendHandler) GetByCatID(c *gin.Context) {
 		return
 	}
 
-	data, err := h.catUsecase.GetCluster(c, id, userID)
+	data, err := h.recommendUsecase.RecommendByCat(c, id, userID)
 	if err != nil {
 		response.NewError(c, err)
 		return
@@ -56,8 +56,14 @@ func (h *RecommendHandler) GetByCatID(c *gin.Context) {
 // @accept json
 // @produce json
 // @Router /api/recommend/cat [get]
-func (h *RecommendHandler) GetRandom(c *gin.Context) {
-	data, err := h.catUsecase.GetRandom(c)
+func (h *RecommendHandler) GetByUser(c *gin.Context) {
+	userID, err := strconv.ParseInt(c.Param("user_id"), 10, 64)
+	if err != nil {
+		response.NewError(c, err)
+		return
+	}
+
+	data, err := h.recommendUsecase.RecommendByUser(c, userID)
 	if err != nil {
 		response.NewError(c, err)
 		return

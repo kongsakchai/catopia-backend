@@ -145,5 +145,17 @@ func (h *UserHandler) UserAnswer(c *gin.Context) {
 		return
 	}
 
+	id, err := strconv.ParseInt(c.Param("user_id"), 10, 64)
+	if err != nil {
+		response.NewError(c, err)
+		return
+	}
+
+	err = h.userUsecase.UpdateGroup(c, id, req.Answer)
+	if err != nil {
+		response.NewError(c, err)
+		return
+	}
+
 	response.New(c, http.StatusCreated, "success", nil)
 }

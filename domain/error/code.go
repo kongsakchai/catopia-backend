@@ -18,6 +18,8 @@ const (
 	ErrUserUpdate         = 1003
 	ErrUserGetByUsername  = 1004
 	ErrUserUpdatePassword = 1005
+	ErrUserUpdateGroup    = 1006
+	ErrUserGetByGroup     = 1007
 
 	ErrTreatmentTypeGet    = 2000
 	ErrTreatmentGetByID    = 2001

@@ -26,6 +26,8 @@ type UserRepository interface {
 	Create(ctx context.Context, user *User) error
 	Update(ctx context.Context, user *User) error
 	UpdatePassword(ctx context.Context, id int64, password string, salt string) error
+	UpdateGroup(ctx context.Context, id int64, groupID int64) error
+	GetUserIDsByGroup(ctx context.Context, groupID int64) ([]int64, error)
 }
 
 type UserUsecase interface {
@@ -36,6 +38,8 @@ type UserUsecase interface {
 	Update(ctx context.Context, id int64, user *User) error
 	ResetPassword(ctx context.Context, code string, password string) error
 	ForgetPassword(ctx context.Context, username string) (string, error)
+	GetUserIDsInSameGroup(ctx context.Context, id int64) ([]int64, error)
+	UpdateGroup(ctx context.Context, id int64, answer []float64) error
 	// CreateOTP(ctx context.Context, username string) (string, error)
 	// VerifyOTP(ctx context.Context, code string, otp string) error
 	// UpdatePasswordWithCode(ctx context.Context, code string, password string) error

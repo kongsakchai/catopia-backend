@@ -64,17 +64,18 @@ func (a *API) initRoute() {
 	otpUsecase := usecase.NewOTPUsecase()
 	modelUsecase := usecase.NewModelUsecae()
 	sessionUsecase := usecase.NewSessionUsecase(sessionRepo)
-	userUsecase := usecase.NewUserUsecase(userRepo, fileUsecase, otpUsecase)
+	userUsecase := usecase.NewUserUsecase(userRepo, fileUsecase, otpUsecase, modelUsecase)
 	authUsecase := usecase.NewAuthUsecase(userUsecase, sessionUsecase)
 	catUsecase := usecase.NewCatUsecase(catRepo, fileUsecase, modelUsecase)
 	treatmentUsecase := usecase.NewTreatmentUsecase(treatmentRepo, catUsecase)
+	recommendUsecase := usecase.NewRecommendUsecase(catUsecase, userUsecase)
 
 	authHandler := handler.NewAuthHandler(authUsecase)
 	userHandler := handler.NewUserHandler(userUsecase)
 	catHandler := handler.NewCatHandler(catUsecase)
 	treatmentHandler := handler.NewTreatmentHandler(treatmentUsecase)
 	otpHandler := handler.NewOTPHandler(otpUsecase)
-	recommendHandler := handler.NewRecommendHandler(catUsecase)
+	recommendHandler := handler.NewRecommendHandler(recommendUsecase)
 
 	authMiddleware := middleware.AuthorizationMiddleware(sessionUsecase)
 
@@ -115,5 +116,5 @@ func (a *API) initRoute() {
 
 	recommend := api.Group("/recommend")
 	recommend.GET("/cat/:id", authMiddleware, recommendHandler.GetByCatID)
-	recommend.GET("/cat/", authMiddleware, recommendHandler.GetRandom)
+	recommend.GET("/cat/", authMiddleware, recommendHandler.GetByUser)
 }

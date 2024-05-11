@@ -18,22 +18,22 @@ func NewAuthUsecase(userUsecase domain.UserUsecase, sessionUsecase domain.Sessio
 	return &authUsecase{userUsecase, sessionUsecase}
 }
 
-func (u *authUsecase) Login(ctx context.Context, username, password string) (string, error) {
+func (u *authUsecase) Login(ctx context.Context, username, password string) (bool, string, error) {
 	user, err := u.userUsecase.GetByUsername(ctx, username)
 	if err != nil {
-		return "", err
+		return false, "", err
 	}
 
 	if !pwd.Compare(password, user.Salt, user.Password) {
-		return "", errs.NewError(errs.ErrUnauthorized, fmt.Errorf("invalid password"))
+		return false, "", errs.NewError(errs.ErrUnauthorized, fmt.Errorf("invalid password"))
 	}
 
 	token, err := u.sessionUsecase.Create(ctx, user.ID)
 	if err != nil {
-		return "", err
+		return false, "", err
 	}
 
-	return token, err
+	return user.GroupID == nil, token, err
 }
 
 func (u *authUsecase) Logout(ctx context.Context, id string) error {

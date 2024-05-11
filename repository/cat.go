@@ -47,6 +47,21 @@ func (r *catRepository) GetByUserID(ctx context.Context, userID int64) ([]domain
 	return cats, nil
 }
 
+func (r *catRepository) GetByUserIDs(ctx context.Context, userID []int64) ([]domain.Cat, error) {
+	getSql, args, err := squirrel.Select("*").From("cat").Where(squirrel.Eq{"user_id": userID}).ToSql()
+	if err != nil {
+		return nil, errs.NewError(errs.ErrInternal, err)
+	}
+
+	var cats []domain.Cat
+	err = r.db.SelectContext(ctx, &cats, getSql, args...)
+	if err != nil {
+		return nil, errs.NewError(errs.ErrInternal, db.HandlerError(err))
+	}
+
+	return cats, nil
+}
+
 func (r *catRepository) Create(ctx context.Context, cat *domain.Cat) error {
 	createSql, _, err := squirrel.Insert("cat").
 		Columns("name", "weight", "gender", "profile", "date", "breeding", "aggression", "shyness", "extraversion", "user_id").
@@ -123,12 +138,18 @@ func (r *catRepository) Delete(ctx context.Context, id int64) error {
 	return nil
 }
 
-func (r *catRepository) GetCluster(ctx context.Context, group int64) ([]string, error) {
-	findSql, args, err := squirrel.Select("breed").From("breeding").
+func (r *catRepository) GetBreedingByGroup(ctx context.Context, group []int64, random bool) ([]string, error) {
+	build := squirrel.Select("breed").From("breeding").
 		LeftJoin("cat_group ON breeding.group_name = cat_group.group_name").
-		Where(squirrel.Eq{"cat_group.group": group}).
-		OrderBy("cat_group.count DESC").
-		ToSql()
+		Where(squirrel.Eq{"cat_group.group": group}).Limit(10)
+
+	if random {
+		build = build.OrderBy("RAND()")
+	} else {
+		build = build.OrderBy("cat_group.count DESC")
+	}
+
+	findSql, args, err := build.ToSql()
 
 	if err != nil {
 		return nil, errs.NewError(errs.ErrCatGetCluster, err)
@@ -143,7 +164,7 @@ func (r *catRepository) GetCluster(ctx context.Context, group int64) ([]string, 
 	return breeds, nil
 }
 
-func (r *catRepository) GetRandom(ctx context.Context) ([]string, error) {
+func (r *catRepository) GetBreedingByRandom(ctx context.Context) ([]string, error) {
 	findSql, args, err := squirrel.Select("breed").From("breeding").OrderBy("RAND()").Limit(10).ToSql()
 
 	if err != nil {

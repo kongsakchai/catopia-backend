@@ -16,7 +16,7 @@ services:
       - .env
     healthcheck:
       test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
-      timeout: 30s
+      timeout: 10s
       retries: 5
 
   adminer:

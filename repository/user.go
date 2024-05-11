@@ -122,3 +122,36 @@ func (u *userRepository) UpdatePassword(ctx context.Context, id int64, password 
 
 	return nil
 }
+
+func (u *userRepository) UpdateGroup(ctx context.Context, id int64, groupID int64) error {
+	updateSql, args, err := sq.Update("users").
+		Set("group_id", groupID).
+		Where(sq.Eq{"id": id}).
+		ToSql()
+
+	if err != nil {
+		return errs.NewError(errs.ErrUserUpdateGroup, err)
+	}
+
+	_, err = u.db.ExecContext(ctx, updateSql, args...)
+	if err != nil {
+		return errs.NewError(errs.ErrUserUpdateGroup, db.HandlerError(err))
+	}
+
+	return nil
+}
+
+func (u *userRepository) GetUserIDsByGroup(ctx context.Context, id int64) ([]int64, error) {
+	getSql, args, err := sq.Select("id").From("users").Where(sq.Eq{"group_id": id}).ToSql()
+	if err != nil {
+		return nil, errs.NewError(errs.ErrUserGetByGroup, err)
+	}
+
+	user := []int64{}
+	err = u.db.SelectContext(ctx, &user, getSql, args...)
+	if err != nil {
+		return nil, errs.NewError(errs.ErrUserGetByGroup, db.HandlerError(err))
+	}
+
+	return user, nil
+}

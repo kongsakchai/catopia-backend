@@ -8,7 +8,8 @@ type Login struct {
 }
 
 type LoginResponse struct {
-	Token string `json:"token"`
+	FirstLogin bool   `json:"firstLogin"`
+	Token      string `json:"token"`
 }
 
 type Regis struct {

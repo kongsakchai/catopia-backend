@@ -10,17 +10,17 @@ import (
 )
 
 type catUsecase struct {
-	repo        domain.CatRepository
-	fileUsecase domain.FileUsecase
-	model       domain.ModelUsecae
+	catRepo      domain.CatRepository
+	fileUsecase  domain.FileUsecase
+	modelUsecase domain.ModelUsecae
 }
 
-func NewCatUsecase(repo domain.CatRepository, fileUsecase domain.FileUsecase, model domain.ModelUsecae) domain.CatUsecase {
-	return &catUsecase{repo, fileUsecase, model}
+func NewCatUsecase(catRepo domain.CatRepository, fileUsecase domain.FileUsecase, modelUsecase domain.ModelUsecae) domain.CatUsecase {
+	return &catUsecase{catRepo, fileUsecase, modelUsecase}
 }
 
 func (u *catUsecase) GetByID(ctx context.Context, id int64, userID int64) (*domain.Cat, error) {
-	cat, err := u.repo.GetByID(ctx, id, userID)
+	cat, err := u.catRepo.GetByID(ctx, id, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -33,7 +33,7 @@ func (u *catUsecase) GetByID(ctx context.Context, id int64, userID int64) (*doma
 }
 
 func (u *catUsecase) GetByUserID(ctx context.Context, userID int64) ([]domain.Cat, error) {
-	cats, err := u.repo.GetByUserID(ctx, userID)
+	cats, err := u.catRepo.GetByUserID(ctx, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -42,15 +42,23 @@ func (u *catUsecase) GetByUserID(ctx context.Context, userID int64) ([]domain.Ca
 
 func (u *catUsecase) Create(ctx context.Context, userID int64, cat *domain.Cat) error {
 	cat.UserID = userID
-	err := u.repo.Create(ctx, cat)
+	err := u.catRepo.Create(ctx, cat)
 	if err != nil {
 		return err
 	}
+
+	go func() {
+		id, err := u.modelUsecase.CatGroup([]float64{float64(cat.Aggression), float64(cat.Shyness), float64(cat.Extraversion)})
+		if err == nil {
+			u.catRepo.UpdateGroup(ctx, cat.ID, id)
+		}
+	}()
+
 	return nil
 }
 
 func (u *catUsecase) Update(ctx context.Context, id int64, userID int64, cat *domain.Cat) error {
-	find, err := u.repo.GetByID(ctx, id, userID)
+	find, err := u.catRepo.GetByID(ctx, id, userID)
 	if err != nil {
 		return err
 	}
@@ -88,34 +96,27 @@ func (u *catUsecase) Update(ctx context.Context, id int64, userID int64, cat *do
 	find.Extraversion = cat.Extraversion
 
 	go func() {
-		id, err := u.model.CatGroup([]float64{float64(find.Aggression), float64(find.Shyness), float64(find.Extraversion)})
+		id, err := u.modelUsecase.CatGroup([]float64{float64(find.Aggression), float64(find.Shyness), float64(find.Extraversion)})
 		if err == nil {
-			u.repo.UpdateGroup(ctx, find.ID, id)
+			u.catRepo.UpdateGroup(ctx, find.ID, id)
 		}
 	}()
 
-	err = u.repo.Update(ctx, find)
+	err = u.catRepo.Update(ctx, find)
 	if err != nil {
 		return err
 	}
-
-	go func() {
-		id, err := u.model.CatGroup([]float64{float64(find.Aggression), float64(find.Shyness), float64(find.Extraversion)})
-		if err == nil && id != -1 {
-			u.repo.UpdateGroup(ctx, find.ID, id)
-		}
-	}()
 
 	return nil
 }
 
 func (u *catUsecase) Delete(ctx context.Context, id int64, userID int64) error {
-	_, err := u.repo.GetByID(ctx, id, userID)
+	_, err := u.catRepo.GetByID(ctx, id, userID)
 	if err != nil {
 		return err
 	}
 
-	err = u.repo.Delete(ctx, id)
+	err = u.catRepo.Delete(ctx, id)
 	if err != nil {
 		return err
 	}
@@ -123,7 +124,7 @@ func (u *catUsecase) Delete(ctx context.Context, id int64, userID int64) error {
 	return nil
 }
 
-func (u *catUsecase) GetCluster(ctx context.Context, id int64, userID int64) ([]string, error) {
+func (u *catUsecase) GetBreedingByCat(ctx context.Context, id int64, userID int64) ([]string, error) {
 	find, err := u.GetByID(ctx, id, userID)
 	if err != nil {
 		return nil, err
@@ -136,7 +137,7 @@ func (u *catUsecase) GetCluster(ctx context.Context, id int64, userID int64) ([]
 		groupID = *find.Group_ID
 	}
 
-	groups, err := u.repo.GetCluster(ctx, groupID)
+	groups, err := u.catRepo.GetBreedingByGroup(ctx, []int64{groupID}, false)
 	if err != nil {
 		return nil, err
 	}
@@ -144,8 +145,29 @@ func (u *catUsecase) GetCluster(ctx context.Context, id int64, userID int64) ([]
 	return groups, nil
 }
 
-func (u *catUsecase) GetRandom(ctx context.Context) ([]string, error) {
-	groups, err := u.repo.GetRandom(ctx)
+func (u *catUsecase) GetBreedingByUser(ctx context.Context, userID []int64) ([]string, error) {
+	cats, err := u.catRepo.GetByUserIDs(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	ids := []int64{}
+	for _, cat := range cats {
+		if cat.Group_ID != nil {
+			ids = append(ids, *cat.Group_ID)
+		}
+	}
+
+	groups, err := u.catRepo.GetBreedingByGroup(ctx, ids, true)
+	if err != nil {
+		return nil, err
+	}
+
+	return groups, nil
+}
+
+func (u *catUsecase) GetBreedingByRandom(ctx context.Context) ([]string, error) {
+	groups, err := u.catRepo.GetBreedingByRandom(ctx)
 	if err != nil {
 		return nil, err
 	}

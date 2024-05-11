@@ -26,5 +26,5 @@ type VerifyOTP struct {
 }
 
 type UserAnswer struct {
-	Answer []int `json:"answer" binding:"required" example:"1,2,3,4,5"`
+	Answer []float64 `json:"answer" binding:"required" example:"1,2,3,4,5"`
 }

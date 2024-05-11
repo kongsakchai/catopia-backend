@@ -8,6 +8,6 @@ DROP TABLE IF EXISTS `treatment_type`;
 
 DROP TABLE IF EXISTS `cat`;
 
-DROP TABLE IF EXISTS `session`;
+DROP TABLE IF EXISTS `sessions`;
 
 DROP TABLE IF EXISTS `users`;

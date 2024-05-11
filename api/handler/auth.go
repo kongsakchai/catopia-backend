@@ -79,13 +79,13 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		return
 	}
 
-	token, err := h.authUsecase.Login(c, req.Username, req.Password)
+	first, token, err := h.authUsecase.Login(c, req.Username, req.Password)
 	if err != nil {
 		response.NewError(c, err)
 		return
 	}
 
-	response.New(c, http.StatusCreated, "success", &payload.LoginResponse{Token: token})
+	response.New(c, http.StatusCreated, "success", &payload.LoginResponse{FirstLogin: first, Token: token})
 }
 
 func (h *AuthHandler) Logout(c *gin.Context) {

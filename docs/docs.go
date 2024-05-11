@@ -792,6 +792,9 @@ const docTemplate = `{
                 "location": {
                     "type": "string"
                 },
+                "name": {
+                    "type": "string"
+                },
                 "treatmentTypeID": {
                     "type": "integer"
                 },
@@ -927,6 +930,9 @@ const docTemplate = `{
         "payload.LoginResponse": {
             "type": "object",
             "properties": {
+                "firstLogin": {
+                    "type": "boolean"
+                },
                 "token": {
                     "type": "string"
                 }
@@ -1102,14 +1108,14 @@ const docTemplate = `{
                 "answer": {
                     "type": "array",
                     "items": {
-                        "type": "string"
+                        "type": "number"
                     },
                     "example": [
-                        "1",
-                        "2",
-                        "3",
-                        "4",
-                        "5"
+                        1,
+                        2,
+                        3,
+                        4,
+                        5
                     ]
                 }
             }
