@@ -34,7 +34,7 @@ func (r *treatmentRepository) GetType(ctx context.Context) ([]domain.TreatmentTy
 func (r *treatmentRepository) GetByID(ctx context.Context, id int64, catID int64) (*domain.Treatment, error) {
 	getSql, args, err := sq.Select("t.*", "tt.treatment_type as name").From("treatment t").
 		LeftJoin("treatment_type tt ON t.treatment_type_id = tt.id").
-		Where(sq.Eq{"id": id, "cat_id": catID}).ToSql()
+		Where(sq.Eq{"t.id": id, "t.cat_id": catID}).ToSql()
 	if err != nil {
 		return nil, errs.NewError(errs.ErrTreatmentGetByID, err)
 	}
@@ -53,13 +53,13 @@ func (r *treatmentRepository) GetByCatID(ctx context.Context, catID int64) ([]do
 		LeftJoin("treatment_type tt ON t.treatment_type_id = tt.id").
 		Where(sq.Eq{"cat_id": catID}).ToSql()
 	if err != nil {
-		return nil, errs.NewError(errs.ErrTreatmentGetByID, err)
+		return nil, errs.NewError(errs.ErrTreatmentGetByCatID, err)
 	}
 
 	var treatment []domain.Treatment
 	err = r.db.SelectContext(ctx, &treatment, getSql, args...)
 	if err != nil {
-		return nil, errs.NewError(errs.ErrTreatmentGetByID, db.HandlerError(err))
+		return nil, errs.NewError(errs.ErrTreatmentGetByCatID, db.HandlerError(err))
 	}
 
 	return treatment, nil

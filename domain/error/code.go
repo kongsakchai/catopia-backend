@@ -19,11 +19,12 @@ const (
 	ErrUserGetByUsername  = 1004
 	ErrUserUpdatePassword = 1005
 
-	ErrTreatmentTypeGet = 2000
-	ErrTreatmentGetByID = 2001
-	ErrTreatmentCreate  = 2002
-	ErrTreatmentUpdate  = 2003
-	ErrTreatmentDelete  = 2004
+	ErrTreatmentTypeGet    = 2000
+	ErrTreatmentGetByID    = 2001
+	ErrTreatmentGetByCatID = 2001
+	ErrTreatmentCreate     = 2002
+	ErrTreatmentUpdate     = 2003
+	ErrTreatmentDelete     = 2004
 
 	ErrSessionCreate = 3000
 	ErrSessionGet    = 3001
