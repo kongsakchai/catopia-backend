@@ -3,11 +3,11 @@ package main
 import (
 	_ "os"
 
+	"github.com/kongsakchai/catopia-backend/api"
+	db "github.com/kongsakchai/catopia-backend/database"
 	_ "github.com/kongsakchai/catopia-backend/docs"
 
-	"github.com/kongsakchai/catopia-backend/api"
 	"github.com/kongsakchai/catopia-backend/config"
-	db "github.com/kongsakchai/catopia-backend/database"
 	ort "github.com/yalue/onnxruntime_go"
 )
 
