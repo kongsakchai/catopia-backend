@@ -31,16 +31,16 @@ func (u *ModelUsecae) CatGroup(input []float64) (int64, error) {
 
 	var output []float64
 	if err := u.stdModel.Run(input, &output); err != nil {
-		return -1, err
+		return 0, err
 	}
 
 	if err := u.pcaModel.Run(output, &output); err != nil {
-		return -1, err
+		return 0, err
 	}
 
 	var result []int64
 	if err := u.catModel.Run(output, &result); err != nil {
-		return -1, err
+		return 0, err
 	}
 
 	return result[0], nil

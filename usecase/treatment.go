@@ -36,7 +36,7 @@ func (t *treatmentUsecase) GetByID(ctx context.Context, id int64, catID int64) (
 	}
 
 	if data == nil {
-		return nil, errs.NewError(errs.ErrNotFound, fmt.Errorf("Treatment not found"))
+		return nil, errs.NewError(errs.ErrNotFound, fmt.Errorf("treatment not found"))
 	}
 
 	return data, nil
@@ -49,7 +49,7 @@ func (t *treatmentUsecase) GetByCatID(ctx context.Context, catID int64, userID i
 	}
 
 	if cat == nil {
-		return nil, errs.NewError(errs.ErrNotFound, fmt.Errorf("Cat not found"))
+		return nil, errs.NewError(errs.ErrNotFound, fmt.Errorf("cat not found"))
 	}
 
 	data, err := t.treatmentRepo.GetByCatID(ctx, cat.ID)

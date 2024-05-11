@@ -49,7 +49,7 @@ func (r *treatmentRepository) GetByID(ctx context.Context, id int64, catID int64
 }
 
 func (r *treatmentRepository) GetByCatID(ctx context.Context, catID int64) ([]domain.Treatment, error) {
-	getSql, args, err := sq.Select("t.*", "tt.treatment_type as name").From("treatment").
+	getSql, args, err := sq.Select("t.*", "tt.treatment_type as name").From("treatment t").
 		LeftJoin("treatment_type tt ON t.treatment_type_id = tt.id").
 		Where(sq.Eq{"cat_id": catID}).ToSql()
 	if err != nil {

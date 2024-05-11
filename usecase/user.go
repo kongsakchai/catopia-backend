@@ -111,8 +111,8 @@ func (u *userUsecase) Update(ctx context.Context, id int64, user *domain.User) e
 		find.Gender = user.Gender
 	}
 
-	if user.Profile != nil && find.Profile != nil {
-		if strings.Compare(*find.Profile, *user.Profile) != 0 {
+	if user.Profile != nil {
+		if find.Profile != nil && strings.Compare(*find.Profile, *user.Profile) != 0 {
 			u.fileUsecase.RemoveFile(*find.Profile)
 		}
 
@@ -163,6 +163,5 @@ func (u *userUsecase) ForgetPassword(ctx context.Context, username string) (stri
 		return "", errs.NewError(errs.ErrNotFound, fmt.Errorf("user not found"))
 	}
 
-	code, err := u.otpUsecase.Create(ctx, user.ID, user.Email)
-	return code, nil
+	return u.otpUsecase.Create(ctx, user.ID, user.Email)
 }

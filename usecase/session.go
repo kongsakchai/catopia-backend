@@ -95,7 +95,7 @@ func (u *sessionUsecase) FindByID(ctx context.Context, id string) (*domain.Sessi
 	}
 
 	if session == nil {
-		return nil, errs.NewError(errs.ErrNotFound, fmt.Errorf("Session not found"))
+		return nil, errs.NewError(errs.ErrNotFound, fmt.Errorf("session not found"))
 	}
 
 	return session, nil

@@ -55,8 +55,8 @@ func (u *catUsecase) Update(ctx context.Context, id int64, userID int64, cat *do
 		return err
 	}
 
-	if cat.Profile != nil && find.Profile != nil {
-		if strings.Compare(*find.Profile, *cat.Profile) != 0 {
+	if cat.Profile != nil {
+		if find.Profile != nil && strings.Compare(*find.Profile, *cat.Profile) != 0 {
 			u.fileUsecase.RemoveFile(*find.Profile)
 		}
 
@@ -124,12 +124,19 @@ func (u *catUsecase) Delete(ctx context.Context, id int64, userID int64) error {
 }
 
 func (u *catUsecase) GetCluster(ctx context.Context, id int64, userID int64) ([]string, error) {
-	_, err := u.GetByID(ctx, id, userID)
+	find, err := u.GetByID(ctx, id, userID)
 	if err != nil {
 		return nil, err
 	}
 
-	groups, err := u.repo.GetCluster(ctx, id)
+	var groupID int64
+	if find.Group_ID == nil {
+		groupID = 0
+	} else {
+		groupID = *find.Group_ID
+	}
+
+	groups, err := u.repo.GetCluster(ctx, groupID)
 	if err != nil {
 		return nil, err
 	}
