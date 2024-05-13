@@ -116,5 +116,5 @@ func (a *API) initRoute() {
 
 	recommend := api.Group("/recommend")
 	recommend.GET("/cat/:id", authMiddleware, recommendHandler.GetByCatID)
-	recommend.GET("/cat/", authMiddleware, recommendHandler.GetByUser)
+	recommend.GET("/cat", authMiddleware, recommendHandler.GetByUser)
 }
