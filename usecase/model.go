@@ -47,10 +47,8 @@ func (u *ModelUsecae) CatGroup(input []float64) (int64, error) {
 }
 
 func (u *ModelUsecae) UserGroup(input []float64) (int64, error) {
-	var output []float64
-
 	var result []int64
-	if err := u.userModel.Run(output, &result); err != nil {
+	if err := u.userModel.Run(input, &result); err != nil {
 		return -1, err
 	}
 
