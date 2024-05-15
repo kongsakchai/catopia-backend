@@ -93,6 +93,27 @@ const docTemplate = `{
                 "responses": {}
             }
         },
+        "/api/auth/verify": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Verify token",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "operationId": "VerifyTokenHandler",
+                "responses": {}
+            }
+        },
         "/api/cat": {
             "get": {
                 "security": [
@@ -653,13 +674,6 @@ const docTemplate = `{
                 "operationId": "UserUpdateHandler",
                 "parameters": [
                     {
-                        "type": "integer",
-                        "description": "user id",
-                        "name": "user_id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
                         "description": "user data",
                         "name": "body",
                         "in": "body",
@@ -701,6 +715,27 @@ const docTemplate = `{
                         }
                     }
                 ],
+                "responses": {}
+            }
+        },
+        "/api/user/noti": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get treatment notification",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "operationId": "UserGetTreatmentNotiHandler",
                 "responses": {}
             }
         },
@@ -774,6 +809,12 @@ const docTemplate = `{
         "domain.Treatment": {
             "type": "object",
             "properties": {
+                "appointment": {
+                    "type": "string"
+                },
+                "appointmentDate": {
+                    "type": "string"
+                },
                 "catID": {
                     "type": "integer"
                 },
@@ -875,6 +916,15 @@ const docTemplate = `{
                 "treatmentTypeID"
             ],
             "properties": {
+                "appointment": {
+                    "type": "string",
+                    "example": "Detail"
+                },
+                "appointmentDate": {
+                    "type": "string",
+                    "format": "datetime",
+                    "example": "2021-01-25T07:30"
+                },
                 "date": {
                     "type": "string",
                     "format": "date",
@@ -1042,6 +1092,15 @@ const docTemplate = `{
         "payload.UpdateTreatment": {
             "type": "object",
             "properties": {
+                "appointment": {
+                    "type": "string",
+                    "example": "Detail"
+                },
+                "appointmentDate": {
+                    "type": "string",
+                    "format": "datetime",
+                    "example": "2021-01-25T07:30"
+                },
                 "date": {
                     "type": "string",
                     "format": "date",

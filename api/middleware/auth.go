@@ -26,7 +26,7 @@ func AuthorizationMiddleware(sessionUsecase domain.SessionUsecase) gin.HandlerFu
 
 		session, err := sessionUsecase.ValidateToken(c, token)
 		if err != nil {
-			response.NewError(c, err)
+			response.NewError(c, errs.NewError(errs.ErrUnauthorized, fmt.Errorf("Unauthorized")))
 			c.Abort()
 			return
 		}

@@ -7,9 +7,10 @@ import (
 )
 
 var ErrCodeToHTTPStatus = map[int]int{
-	errs.ErrNotFound:   http.StatusNotFound,
-	errs.ErrConflict:   http.StatusConflict,
-	errs.ErrBadRequest: http.StatusBadRequest,
+	errs.ErrNotFound:     http.StatusNotFound,
+	errs.ErrConflict:     http.StatusConflict,
+	errs.ErrBadRequest:   http.StatusBadRequest,
+	errs.ErrUnauthorized: http.StatusUnauthorized,
 
 	errs.ErrTransaction: http.StatusInternalServerError,
 	errs.ErrRollback:    http.StatusInternalServerError,

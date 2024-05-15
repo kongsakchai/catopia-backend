@@ -48,10 +48,6 @@ func (t *treatmentUsecase) GetByCatID(ctx context.Context, catID int64, userID i
 		return nil, err
 	}
 
-	if cat == nil {
-		return nil, errs.NewError(errs.ErrNotFound, fmt.Errorf("cat not found"))
-	}
-
 	data, err := t.treatmentRepo.GetByCatID(ctx, cat.ID)
 	if err != nil {
 		return nil, err
@@ -85,8 +81,16 @@ func (t *treatmentUsecase) Update(ctx context.Context, id int64, catID int64, tr
 		find.TreatmentTypeID = treatment.TreatmentTypeID
 	}
 
-	if treatment.Date.Time().Equal(find.Date.Time()) {
+	if !treatment.Date.Time().Equal(find.Date.Time()) {
 		find.Date = treatment.Date
+	}
+
+	if treatment.AppointmentDate != nil {
+		find.AppointmentDate = treatment.AppointmentDate
+	}
+
+	if treatment.Appointment != find.Appointment {
+		find.Appointment = treatment.Appointment
 	}
 
 	if treatment.Location != find.Location {
@@ -121,4 +125,13 @@ func (t *treatmentUsecase) Delete(ctx context.Context, id int64, catID int64) er
 	}
 
 	return nil
+}
+
+func (t *treatmentUsecase) GetTreatmentNoti(ctx context.Context, userID int64) ([]domain.TreatmentNoti, error) {
+	data, err := t.treatmentRepo.GetTreatmentNoti(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	return data, nil
 }

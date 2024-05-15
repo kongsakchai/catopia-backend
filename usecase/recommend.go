@@ -21,7 +21,7 @@ func (u *recommendUsecase) RecommendByCat(ctx context.Context, id int64, userID 
 
 func (u *recommendUsecase) RecommendByUser(ctx context.Context, userID int64) ([]string, error) {
 	ids, err := u.userUsecase.GetUserIDsInSameGroup(ctx, userID)
-	if err != nil || len(ids) == 0 {
+	if err != nil || ids == nil || len(ids) == 0 {
 		return u.catUsecase.GetBreedingByRandom(ctx)
 	}
 

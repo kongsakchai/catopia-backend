@@ -71,7 +71,7 @@ func (a *API) initRoute() {
 	recommendUsecase := usecase.NewRecommendUsecase(catUsecase, userUsecase)
 
 	authHandler := handler.NewAuthHandler(authUsecase)
-	userHandler := handler.NewUserHandler(userUsecase)
+	userHandler := handler.NewUserHandler(userUsecase, treatmentUsecase)
 	catHandler := handler.NewCatHandler(catUsecase)
 	treatmentHandler := handler.NewTreatmentHandler(treatmentUsecase)
 	otpHandler := handler.NewOTPHandler(otpUsecase)
@@ -86,11 +86,13 @@ func (a *API) initRoute() {
 	auth.POST("/register", authHandler.Register)
 	auth.POST("/login", authHandler.Login)
 	auth.DELETE("/logout", authMiddleware, authHandler.Logout)
+	auth.GET("verify", authMiddleware, authHandler.VerifyToken)
 
 	user := api.Group("/user")
 	user.GET("", authMiddleware, userHandler.Get)
 	user.PUT("", authMiddleware, userHandler.Update)
 	user.POST("/answer", authMiddleware, userHandler.UserAnswer)
+	user.GET("/noti", authMiddleware, userHandler.GetTreatmentNoti)
 
 	api.PUT("/reset-password", userHandler.ResetPassword)
 	api.POST("/forget-password", userHandler.ForgetPassword)

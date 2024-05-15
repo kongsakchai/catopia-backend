@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -73,6 +74,8 @@ func (h *CatHandler) GetAll(c *gin.Context) {
 		response.NewError(c, err)
 		return
 	}
+
+	fmt.Println(data)
 
 	response.New(c, http.StatusOK, "success", data)
 }

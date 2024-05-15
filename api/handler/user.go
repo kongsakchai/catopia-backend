@@ -12,11 +12,12 @@ import (
 )
 
 type UserHandler struct {
-	userUsecase domain.UserUsecase
+	userUsecase      domain.UserUsecase
+	treatmentUsecase domain.TreatmentUsecase
 }
 
-func NewUserHandler(userUsecase domain.UserUsecase) *UserHandler {
-	return &UserHandler{userUsecase}
+func NewUserHandler(userUsecase domain.UserUsecase, treatmentUsecase domain.TreatmentUsecase) *UserHandler {
+	return &UserHandler{userUsecase, treatmentUsecase}
 }
 
 // Get godoc
@@ -50,7 +51,6 @@ func (h *UserHandler) Get(c *gin.Context) {
 // @id UserUpdateHandler
 // @accept json
 // @produce json
-// @param user_id path int true "user id"
 // @param body body payload.UpdateUser true "user data"
 // @Router /api/user [put]
 func (h *UserHandler) Update(c *gin.Context) {
@@ -158,4 +158,28 @@ func (h *UserHandler) UserAnswer(c *gin.Context) {
 	}
 
 	response.New(c, http.StatusCreated, "success", nil)
+}
+
+// GetTreatmentNoti godoc
+// @description Get treatment notification
+// @tags user
+// @security ApiKeyAuth
+// @id UserGetTreatmentNotiHandler
+// @accept json
+// @produce json
+// @Router /api/user/noti [get]
+func (h *UserHandler) GetTreatmentNoti(c *gin.Context) {
+	id, err := strconv.ParseInt(c.Param("user_id"), 10, 64)
+	if err != nil {
+		response.NewError(c, err)
+		return
+	}
+
+	data, err := h.treatmentUsecase.GetTreatmentNoti(c, id)
+	if err != nil {
+		response.NewError(c, err)
+		return
+	}
+
+	response.New(c, http.StatusOK, "success", data)
 }

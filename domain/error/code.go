@@ -27,6 +27,7 @@ const (
 	ErrTreatmentCreate     = 2002
 	ErrTreatmentUpdate     = 2003
 	ErrTreatmentDelete     = 2004
+	ErrTreatmentGetNoti    = 2005
 
 	ErrSessionCreate = 3000
 	ErrSessionGet    = 3001

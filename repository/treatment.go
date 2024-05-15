@@ -67,8 +67,8 @@ func (r *treatmentRepository) GetByCatID(ctx context.Context, catID int64) ([]do
 
 func (r *treatmentRepository) Create(ctx context.Context, treatment *domain.Treatment) error {
 	insertSql, args, err := sq.Insert("treatment").
-		Columns("cat_id", "treatment_type_id", "date", "location", "vet", "detail").
-		Values(treatment.CatID, treatment.TreatmentTypeID, treatment.Date, treatment.Location, treatment.Vet, treatment.Detail).
+		Columns("cat_id", "treatment_type_id", "date", "location", "vet", "detail", "appointment", "appointment_date").
+		Values(treatment.CatID, treatment.TreatmentTypeID, treatment.Date, treatment.Location, treatment.Vet, treatment.Detail, treatment.Appointment, treatment.AppointmentDate).
 		ToSql()
 
 	if err != nil {
@@ -90,6 +90,8 @@ func (r *treatmentRepository) Update(ctx context.Context, treatment *domain.Trea
 		Set("location", treatment.Location).
 		Set("vet", treatment.Vet).
 		Set("detail", treatment.Detail).
+		Set("appointment", treatment.Appointment).
+		Set("appointment_date", treatment.AppointmentDate).
 		Where(sq.Eq{"id": treatment.ID, "cat_id": treatment.CatID}).
 		ToSql()
 
@@ -117,4 +119,23 @@ func (r *treatmentRepository) Delete(ctx context.Context, id int64) error {
 	}
 
 	return nil
+}
+
+func (r *treatmentRepository) GetTreatmentNoti(ctx context.Context, userID int64) ([]domain.TreatmentNoti, error) {
+	getSql, args, err := sq.Select("t.appointment_date", "t.appointment", "c.name as name", "c.id as cat_id", "t.id as id").From("treatment t").
+		Join("cat c ON t.cat_id = c.id").
+		Where(sq.And{sq.Eq{"c.user_id": userID}, sq.Expr("t.appointment_date BETWEEN CURDATE() AND DATE_ADD(CURDATE(),INTERVAL 7 DAY)")}).
+		ToSql()
+
+	if err != nil {
+		return nil, errs.NewError(errs.ErrTreatmentGetNoti, err)
+	}
+
+	var treatment []domain.TreatmentNoti
+	err = r.db.SelectContext(ctx, &treatment, getSql, args...)
+	if err != nil {
+		return nil, errs.NewError(errs.ErrTreatmentGetNoti, db.HandlerError(err))
+	}
+
+	return treatment, nil
 }

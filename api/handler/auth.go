@@ -30,6 +30,18 @@ func (h *AuthHandler) HealthCheck(c *gin.Context) {
 	c.String(http.StatusOK, "OK")
 }
 
+// VerifyToken godoc
+// @description Verify token
+// @tags auth
+// @security ApiKeyAuth
+// @id VerifyTokenHandler
+// @accept json
+// @produce json
+// @Router /api/auth/verify [get]
+func (h *AuthHandler) VerifyToken(c *gin.Context) {
+	response.New(c, http.StatusOK, "success", nil)
+}
+
 // Register godoc
 // @description Register new user
 // @tags auth

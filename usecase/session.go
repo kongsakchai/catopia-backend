@@ -95,7 +95,7 @@ func (u *sessionUsecase) FindByID(ctx context.Context, id string) (*domain.Sessi
 	}
 
 	if session == nil {
-		return nil, errs.NewError(errs.ErrNotFound, fmt.Errorf("session not found"))
+		return nil, errs.NewError(errs.ErrUnauthorized, fmt.Errorf("session not found"))
 	}
 
 	return session, nil
@@ -142,7 +142,7 @@ func (u *sessionUsecase) ValidateToken(ctx context.Context, token string) (*doma
 	if time.Now().After(time.Time(session.ExpiredAt)) {
 		u.Delete(ctx, session.ID)
 
-		return nil, err
+		return nil, errs.NewError(errs.ErrUnauthorized, fmt.Errorf("token expired"))
 	}
 
 	return session, nil

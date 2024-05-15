@@ -32,6 +32,10 @@ definitions:
     type: object
   domain.Treatment:
     properties:
+      appointment:
+        type: string
+      appointmentDate:
+        type: string
       catID:
         type: integer
       createdAt:
@@ -101,6 +105,13 @@ definitions:
     type: object
   payload.CreateTreatment:
     properties:
+      appointment:
+        example: Detail
+        type: string
+      appointmentDate:
+        example: 2021-01-25T07:30
+        format: datetime
+        type: string
       date:
         example: "2021-01-20"
         format: date
@@ -225,6 +236,13 @@ definitions:
     type: object
   payload.UpdateTreatment:
     properties:
+      appointment:
+        example: Detail
+        type: string
+      appointmentDate:
+        example: 2021-01-25T07:30
+        format: datetime
+        type: string
       date:
         example: "2021-01-20"
         format: date
@@ -342,6 +360,19 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/payload.Regis'
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - auth
+  /api/auth/verify:
+    get:
+      consumes:
+      - application/json
+      description: Verify token
+      operationId: VerifyTokenHandler
       produces:
       - application/json
       responses: {}
@@ -702,11 +733,6 @@ paths:
       description: Update user detail
       operationId: UserUpdateHandler
       parameters:
-      - description: user id
-        in: path
-        name: user_id
-        required: true
-        type: integer
       - description: user data
         in: body
         name: body
@@ -733,6 +759,19 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/payload.UserAnswer'
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - user
+  /api/user/noti:
+    get:
+      consumes:
+      - application/json
+      description: Get treatment notification
+      operationId: UserGetTreatmentNotiHandler
       produces:
       - application/json
       responses: {}
