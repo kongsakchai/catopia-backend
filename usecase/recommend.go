@@ -25,5 +25,10 @@ func (u *recommendUsecase) RecommendByUser(ctx context.Context, userID int64) ([
 		return u.catUsecase.GetBreedingByRandom(ctx)
 	}
 
-	return u.catUsecase.GetBreedingByUser(ctx, ids)
+	breeds, err := u.catUsecase.GetBreedingByUser(ctx, ids)
+	if err != nil || breeds == nil || len(breeds) == 0 {
+		return u.catUsecase.GetBreedingByRandom(ctx)
+	}
+
+	return breeds, nil
 }
